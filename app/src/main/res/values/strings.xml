@@ -1,15 +1,32 @@
 <resources>
-    <string name="app_name">MyJeonSe</string>
+    <string name="app_name">청년의집</string>
+
+    <!-- 인트로 -->
+    <string name="intro_tagline">흩어진 공고를\n한곳에 받아보세요</string>
+    <string name="intro_footer">LH · 지방공사 공고 통합</string>
 
     <!-- 바텀 네비게이션 탭 -->
     <string name="main_tab_home">홈</string>
-    <string name="main_tab_notice">공고</string>
-    <string name="main_tab_favorite">찜</string>
+    <string name="main_tab_notice">임대공고</string>
     <string name="main_tab_settings">설정</string>
 
-    <!-- 준비 중인 탭 -->
-    <string name="favorite_placeholder">찜 화면 준비 중</string>
-    <string name="settings_placeholder">설정 화면 준비 중</string>
+    <!-- 임장노트: 기능 미구현이라 탭에서 빠져 있다. 화면 자체는 남겨 둔다. -->
+    <string name="note_placeholder">임장노트 준비 중</string>
+
+    <!-- 설정 -->
+    <string name="settings_section_display">표시 · 지역</string>
+    <string name="settings_region">관심 지역</string>
+    <string name="settings_region_description">홈과 임대공고 목록에 함께 적용됩니다</string>
+    <string name="settings_category">공고 분야</string>
+    <string name="settings_category_description">임대공고 목록에서 먼저 보여줄 분야</string>
+    <string name="settings_section_info">정보</string>
+    <string name="settings_privacy_policy">개인정보처리방침</string>
+    <string name="settings_privacy_policy_value">보기</string>
+    <string name="settings_data_source">데이터 출처</string>
+    <string name="settings_data_source_value">공공데이터포털</string>
+    <string name="settings_version">앱 버전</string>
+    <string name="settings_dialog_close">닫기</string>
+    <string name="settings_footnote">설정은 이 기기에만 저장되며 서버로 전송되지 않습니다. 공고 정보는 국토교통부 마이홈포털이 공공데이터포털을 통해 제공합니다.</string>
 
     <!-- 공통 -->
     <string name="retry">다시 시도</string>
@@ -20,6 +37,8 @@
     <string name="error_unknown">알 수 없는 오류가 발생했습니다</string>
 
     <!-- 홈 -->
+    <string name="home_block_notice">공고 알림</string>
+
     <string name="home_urgent_label">가장 급한 마감</string>
     <string name="home_dday_format">D-%1$d</string>
     <string name="home_urgent_deadline">%1$s에 접수가 끝납니다.</string>
@@ -27,10 +46,11 @@
 
     <string name="home_section_new_notice">오늘의 새 공고</string>
     <string name="home_section_recent_notice">최근 올라온 공고</string>
-    <string name="home_section_count">%1$d건</string>
+    <string name="home_section_see_all">%1$d건 · 전체 보기</string>
     <string name="home_new_notice_empty">오늘 올라온 공고가 없습니다</string>
 
     <string name="home_section_region_status">공고 현황</string>
+    <string name="home_section_region_status_scope">임대 + 분양</string>
     <string name="home_stat_open">접수중</string>
     <string name="home_stat_upcoming">예정</string>
     <string name="home_stat_closing_today">오늘 마감</string>
@@ -49,32 +69,47 @@
     <string name="home_footnote">공고 내용은 원문이 우선합니다. 앱 표기와 다를 경우 각 기관 공고문을 확인해 주세요.</string>
 
     <!-- 공고 목록 -->
+    <string name="notice_list_title">임대공고</string>
     <string name="notice_region_label">지역</string>
     <string name="notice_region_all">전체</string>
+    <string name="notice_category_label">공고 분야</string>
+    <string name="notice_category_rental">공공임대</string>
+    <string name="notice_category_sale">공공분양</string>
     <string name="notice_empty">조회된 모집공고가 없습니다</string>
 
     <!-- 공고 상세 -->
     <string name="notice_detail_title">모집공고 상세</string>
     <string name="notice_detail_back">뒤로 가기</string>
-    <string name="notice_detail_open_original">공고 원문 보기</string>
-    <string name="notice_detail_no_url">연결할 수 있는 공고 링크가 없습니다</string>
+    <string name="notice_detail_open_original">공고 상세 보기</string>
+    <string name="notice_detail_apply_at">%1$s에서 신청하기</string>
+    <string name="notice_detail_apply">신청하러 가기</string>
+    <string name="notice_detail_section_info">공고 정보</string>
+    <string name="notice_detail_section_payment">그 밖의 납부금</string>
+    <string name="notice_detail_schedule">일정</string>
+    <string name="notice_detail_schedule_count">%1$d단계</string>
+    <string name="notice_detail_schedule_footnote">서류 제출·계약 체결 일정은 공고 원문에서 확인해 주세요.</string>
+    <string name="notice_detail_footnote">최종 자격 판정은 공고 주체에 있습니다. 앱 표기와 다를 경우 공고문이 우선합니다.</string>
 
-    <string name="notice_field_institution">공급기관</string>
+    <string name="notice_schedule_announced">모집공고</string>
+    <string name="notice_schedule_apply">접수</string>
+    <string name="notice_schedule_result">당첨자 발표</string>
+
+    <string name="notice_summary_deposit">보증금</string>
+    <string name="notice_summary_monthly_rent">월 임대료</string>
+    <string name="notice_summary_balance">잔금</string>
+    <string name="notice_summary_supply">공급 호수</string>
+    <string name="notice_summary_total">총 세대수</string>
+    <string name="notice_detail_no_url">연결할 수 있는 공고 링크가 없습니다</string>
+    <string name="notice_detail_open_map">지도에서 보기</string>
+    <string name="notice_detail_no_map_app">지도 앱을 열 수 없습니다</string>
+
     <string name="notice_field_house_type">주택유형</string>
     <string name="notice_field_complex">단지명</string>
     <string name="notice_field_region">지역</string>
     <string name="notice_field_address">주소</string>
     <string name="notice_field_heating">난방방식</string>
-    <string name="notice_field_notice_date">공고일</string>
-    <string name="notice_field_apply_period">모집기간</string>
-    <string name="notice_field_winner_date">당첨자 발표</string>
-    <string name="notice_field_total_household">총 세대수</string>
-    <string name="notice_field_supply_count">공급 호수</string>
-    <string name="notice_field_deposit">최소 임대보증금</string>
-    <string name="notice_field_monthly_rent">최소 월임대료</string>
     <string name="notice_field_down_payment">최소 계약금</string>
     <string name="notice_field_interim_payment">최소 중도금</string>
-    <string name="notice_field_balance">최소 잔금</string>
     <string name="notice_field_contact">문의처</string>
 
     <string name="notice_unit_won">%1$s원</string>

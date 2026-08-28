@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MyJeonSe" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.YouthHouse" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!--
+      런처 테마. 앱 아이콘을 누른 직후 뜨는 첫 창의 배경이다.
+      기본값(흰색)이면 인트로의 코발트 화면 직전에 흰 화면이 한 번 번쩍이므로
+      인트로와 같은 색으로 맞춰 이음매를 없앤다. 창이 뜬 뒤 MainActivity가 앱 테마로 되돌린다.
+    -->
+    <style name="Theme.YouthHouse.Launch" parent="Theme.YouthHouse">
+        <item name="android:windowBackground">@color/cobalt</item>
+
+        <!--
+          시스템 바까지 창 배경이 비치게 해서 런치 창 전체를 코발트로 채운다.
+          그러지 않으면 인트로가 뜨기 전까지 상태바는 회색, 내비바는 흰색으로 남아
+          코발트 화면에 띠가 두 개 생긴다. 아이콘도 어두운 배경에 맞춰 밝게 둔다.
+        -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 </resources>

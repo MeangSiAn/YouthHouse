@@ -1,19 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+에서 앱 데이터가 기기 밖으로 나가는 두 경로를 모두 막는다.
+
+  `allowBackup="false"`만으로는 부족하다. 그 속성은 Android 12부터 deprecated이고
+  **클라우드 백업만** 막을 뿐, 기기 간 전송(device-transfer)은 그대로 일어난다.
+  설정 화면 각주가 "이 기기에만 저장되며 서버로 전송되지 않습니다"라고 말하고 있으므로
+  두 경로를 다 닫아야 그 말이 사실이 된다. (API 30 이하는 allowBackup="false"가 담당한다.)
+
+  `root`는 앱 데이터 디렉터리 전체(files/, databases/, shared_prefs/)를 가리키고
+  `device_root`는 기기 암호화 저장소 쪽을 가리킨다. 저장하는 것이 관심 지역·공고 분야
+  둘뿐이라 남겨서 얻을 것도 없다.
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <exclude domain="root" />
+        <exclude domain="device_root" />
+        <exclude domain="external" />
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <exclude domain="root" />
+        <exclude domain="device_root" />
+        <exclude domain="external" />
     </device-transfer>
-    -->
 </data-extraction-rules>

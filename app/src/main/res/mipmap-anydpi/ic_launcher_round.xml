@@ -1,32 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  런처 아이콘 전경 — 브랜드 심볼(공고 목록 게시판 + 우상단 알림 점).
-  좌표는 core/designsystem/component/BrandMark.kt와 같은 78 뷰포트 기준이며,
-  group 변환으로 108 캔버스 가운데에 얹는다.
-
-  scale 0.88은 임의로 정한 값이 아니다. 심볼에서 중심에서 가장 먼 지점은 알림 점의
-  바깥쪽 가장자리(중심에서 37.8)인데, adaptive icon의 안전 영역이 지름 66(반지름 33)이라
-  37.8 x 0.88 = 33.3로 맞췄다. 이보다 키우면 원형 마스크에서 알림 점이 잘린다.
--->
+<!-- API 24~25에서 원형 아이콘을 요구하는 런처용. 배경만 원이고 심볼은 ic_launcher와 같다. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
+    <path
+        android:fillColor="#1E3FA0"
+        android:pathData="M2,54 A52,52 0 1 0 106,54 A52,52 0 1 0 2,54 Z" />
+
+    <!-- 원형 마스크 안에 들어가도록 adaptive 버전과 같은 0.88 배율을 쓴다. -->
     <group
         android:scaleX="0.88"
         android:scaleY="0.88"
         android:translateX="19.1"
         android:translateY="20.25">
 
-        <!-- 게시판 -->
         <path
             android:pathData="M21,14 H57 A9,9 0 0 1 66,23 V57 A9,9 0 0 1 57,66 H21 A9,9 0 0 1 12,57 V23 A9,9 0 0 1 21,14 Z"
             android:strokeColor="#FFFFFF"
             android:strokeWidth="3.4" />
 
-        <!-- 공고 세 줄 -->
         <path
             android:pathData="M24,31 H50"
             android:strokeColor="#FFFFFF"
@@ -43,7 +38,6 @@
             android:strokeWidth="3.4"
             android:strokeLineCap="round" />
 
-        <!-- 알림 점 -->
         <path
             android:pathData="M51,18 A9,9 0 1 0 69,18 A9,9 0 1 0 51,18 Z"
             android:fillColor="#FF7A6E" />

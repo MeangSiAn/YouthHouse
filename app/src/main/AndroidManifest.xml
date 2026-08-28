@@ -4,21 +4,30 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!--
+      설정 화면 각주가 "설정은 이 기기에만 저장되며 서버로 전송되지 않습니다"라고 안내하므로
+      앱 데이터가 기기 밖으로 나가지 않게 막는다. API 30 이하는 allowBackup,
+      API 31 이상은 dataExtractionRules가 담당한다(자세한 이유는 그 파일의 주석 참고).
+    -->
+    <!--
+      lint(DataExtractionRules)은 minSdk 24라며 fullBackupContent도 지정하라고 하지만,
+      그 속성은 백업이 켜져 있을 때 "무엇을 백업할지" 고르는 용도다. API 30 이하에서는
+      allowBackup="false"가 백업 자체를 꺼 버리므로 고를 대상이 없다.
+    -->
     <application
         android:name=".app.AppApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
+        tools:ignore="DataExtractionRules"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyJeonSe">
+        android:theme="@style/Theme.YouthHouse">
         <activity
             android:name=".feature.main.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.MyJeonSe"
+            android:theme="@style/Theme.YouthHouse.Launch"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
