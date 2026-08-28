@@ -1,4 +1,4 @@
-<img width="390" height="811" alt="myhome_1" src="https://github.com/user-attachments/assets/d95a3755-4679-459d-aabf-486a5129debd" /><div align="center">
+<div align="center">
 
 <img src="art/ic_launcher_play_512.png" width="96" alt="청년의집 아이콘">
 
@@ -21,8 +21,7 @@ LH와 지방공사가 각자 올리는 공공임대·공공분양 모집공고�
 
 | 홈 | 임대공고 | 공고 상세 | 설정 |
 |:--:|:--:|:--:|:--:|
-| ![홈 화면](![Uploading myhome_1.png…]()
-) | ![임대공고 목록](docs/myhome_2.png) | ![공고 상세](docs/myhome_3.png) | ![설정 화면](docs/myhome_4.png) |
+| ![홈 화면](docs/myhome_1.png) | ![임대공고 목록](docs/myhome_2.png) | ![공고 상세](docs/myhome_3.png) | ![설정 화면](docs/myhome_4.png) |
 | 오늘의 새 공고와 현황 | 지역·분야별 목록 | 일정과 공고 정보 | 지역·분야 지정 |
 
 ## 이런 걸 할 수 있습니다
