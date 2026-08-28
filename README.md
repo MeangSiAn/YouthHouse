@@ -66,20 +66,6 @@ LH와 지방공사가 각자 올리는 공공임대·공공분양 모집공고�
 - `minSdk` 24 · `targetSdk` 36 · `applicationId` `com.ams.youthhouse`
 - 색상은 dynamic color 대신 고정 코발트 팔레트를 사용합니다. 접수중/예정/마감을 색으로 구분하기 때문입니다.
 
-## 빌드
-
-공공데이터포털 인증키가 필요합니다. `local.properties`에 아래 항목을 추가하세요.
-
-```properties
-DATA_GO_KR_SERVICE_KEY=발급받은_URL_인코딩_인증키
-```
-
-```bash
-./gradlew installDebug
-```
-
-릴리즈 서명은 `keystore.properties`(VCS 제외)에서 `storeFile` / `storePassword` / `keyAlias` / `keyPassword`를 읽습니다. 파일이 없으면 debug 키로 서명되며, 그 번들은 Play에 업로드할 수 없습니다.
-
 ## 문의
 
 개인 개발자 안명성 · [ms1994s@naver.com](mailto:ms1994s@naver.com)
