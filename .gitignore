@@ -1,15 +1,39 @@
-*.iml
+# --- 빌드 산출물 ---
+# 모듈별 build/ 는 각 모듈의 .gitignore(app/.gitignore)가 담당한다.
+/build
 .gradle
-/local.properties
+.kotlin
+.externalNativeBuild
+.cxx
+/captures
+
+# --- 비밀값 ---
+# 파일 자체를 리포지토리 밖에 두더라도, 실수로 안에 들어왔을 때를 대비해 패턴으로도 막는다.
+local.properties
+keystore.properties
+*.jks
+*.keystore
+google-services.json
+
+# --- IDE / 에디터 ---
+*.iml
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+# 아래는 Android Studio가 실행·배포할 때 만드는 기기/세션 기록이라 사람마다 다르다.
+/.idea/deploymentTargetSelector.xml
+/.idea/deploymentTargetDropDown.xml
+/.idea/androidTestResultsUserPreferences.xml
+/.idea/appInsightsSettings.xml
+/.idea/migrations.xml
+
+# Claude Code의 개인 설정(권한 허용 목록 등). 공유용은 .claude/settings.json 쪽이다.
+.claude/settings.local.json
+
+# --- 로컬 산출물 ---
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+*.hprof
+*.log

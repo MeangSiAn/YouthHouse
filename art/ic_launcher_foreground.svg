@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Image Asset Studio 전경용. 배경은 투명이고 배경색은 스튜디오에서 #1E3FA0으로 지정한다.
+  108 캔버스에 adaptive icon 안전 영역(지름 66)에 맞춘 0.88 배율로 얹혀 있어,
+  app/src/main/res/drawable/ic_launcher_foreground.xml과 같은 그림이 나온다.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="0 0 108 108">
+  <g transform="translate(19.1 20.25) scale(0.88)">
+    <g fill="none" stroke="#FFFFFF" stroke-width="3.4">
+      <rect x="12" y="14" width="54" height="52" rx="9"/>
+      <path d="M24 31 H50" stroke-linecap="round"/>
+      <path d="M24 40 H54" stroke-linecap="round"/>
+      <path d="M24 49 H42" stroke-linecap="round"/>
+    </g>
+    <circle cx="60" cy="18" r="9" fill="#FF7A6E"/>
+  </g>
+</svg>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Play Console 앱 아이콘 512x512 원본.
+  스토어는 정사각형 전체를 쓰고 모서리는 UI가 알아서 둥글리므로 마스킹 여유가 필요 없다.
+  그래서 런처 아이콘(0.88)보다 크게, 캔버스의 약 55%를 채운다.
+  심볼 좌표는 BrandMark.kt의 78 뷰포트 그대로이고 group 변환만 다르다.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1E3FA0"/>
+
+  <g transform="translate(65.7 71.9) scale(4.8)">
+    <g fill="none" stroke="#FFFFFF" stroke-width="3.4">
+      <rect x="12" y="14" width="54" height="52" rx="9"/>
+      <path d="M24 31 H50" stroke-linecap="round"/>
+      <path d="M24 40 H54" stroke-linecap="round"/>
+      <path d="M24 49 H42" stroke-linecap="round"/>
+    </g>
+    <circle cx="60" cy="18" r="9" fill="#FF7A6E"/>
+  </g>
+</svg>
