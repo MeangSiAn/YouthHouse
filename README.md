@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="art/ic_launcher_play_512.svg" width="96" alt="청년의집 아이콘">
+<img src="art/ic_launcher_play_512.png" width="96" alt="청년의집 아이콘">
 
 # 청년의집
 
@@ -11,7 +11,7 @@ LH와 지방공사가 각자 올리는 공공임대·공공분양 모집공고�
 ![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.2-7F52FF?logo=kotlin&logoColor=white)
 ![Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202026.06-4285F4?logo=jetpackcompose&logoColor=white)
-![License](https://img.shields.io/badge/ads-none-lightgrey)
+![No ads](https://img.shields.io/badge/ads-none-lightgrey) ![No tracking](https://img.shields.io/badge/tracking-none-lightgrey)
 
 </div>
 
@@ -21,7 +21,7 @@ LH와 지방공사가 각자 올리는 공공임대·공공분양 모집공고�
 
 | 홈 | 임대공고 | 공고 상세 | 설정 |
 |:--:|:--:|:--:|:--:|
-| <img src="docs/myhome_1.png" width="200" alt="홈 화면"> | <img src="docs/myhome_2.png" width="200" alt="임대공고 목록"> | <img src="docs/myhome_3.png" width="200" alt="공고 상세"> | <img src="docs/myhome_4.png" width="200" alt="설정"> |
+| ![홈 화면](docs/myhome_1.png) | ![임대공고 목록](docs/myhome_2.png) | ![공고 상세](docs/myhome_3.png) | ![설정 화면](docs/myhome_4.png) |
 | 오늘의 새 공고와 현황 | 지역·분야별 목록 | 일정과 공고 정보 | 지역·분야 지정 |
 
 ## 이런 걸 할 수 있습니다
