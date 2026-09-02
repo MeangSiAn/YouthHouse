@@ -7,18 +7,35 @@
 
     <!-- 바텀 네비게이션 탭 -->
     <string name="main_tab_home">홈</string>
-    <string name="main_tab_notice">임대공고</string>
-    <string name="main_tab_settings">설정</string>
+    <string name="main_tab_notice">공고</string>
+    <string name="main_tab_schedule">내 일정</string>
+    <string name="main_tab_my">마이</string>
 
     <!-- 임장노트: 기능 미구현이라 탭에서 빠져 있다. 화면 자체는 남겨 둔다. -->
     <string name="note_placeholder">임장노트 준비 중</string>
 
-    <!-- 설정 -->
+    <!-- 내 일정 -->
+    <string name="schedule_title">내 일정</string>
+    <string name="schedule_section_upcoming">다가오는 마감</string>
+    <string name="schedule_section_upcoming_window">D-7 이내</string>
+    <string name="schedule_section_favorites">찜한 공고</string>
+    <plurals name="schedule_favorite_count">
+        <item quantity="other">%d건</item>
+    </plurals>
+    <string name="schedule_empty_title">아직 찜한 공고가 없습니다</string>
+    <string name="schedule_empty_description">공고 카드의 하트를 누르면 여기에 모이고,\n마감이 다가오면 맨 위로 올라옵니다.</string>
+    <string name="schedule_empty_action">공고 보러 가기</string>
+    <string name="schedule_footnote">찜은 이 기기에만 저장됩니다. 마감된 공고도 기록으로 남습니다.</string>
+
+    <!-- 마이(설정) -->
+    <string name="my_privacy_title">🔒 개인정보를 수집하지 않습니다</string>
+    <string name="my_privacy_body">회원가입도, 로그인도, 광고 식별자도 없습니다. 이름·연락처·소득·자산을 묻지 않습니다.</string>
+    <string name="my_privacy_points">· 관심 지역과 공고 분야는 기기 안에만 저장\n· 찜한 공고도 기기 안에만 저장\n· 사용 이력을 수집하거나 제3자에게 넘기지 않음</string>
     <string name="settings_section_display">표시 · 지역</string>
     <string name="settings_region">관심 지역</string>
-    <string name="settings_region_description">홈과 임대공고 목록에 함께 적용됩니다</string>
+    <string name="settings_region_description">홈과 공고 목록에 함께 적용됩니다</string>
     <string name="settings_category">공고 분야</string>
-    <string name="settings_category_description">임대공고 목록에서 먼저 보여줄 분야</string>
+    <string name="settings_category_description">공고 목록에서 먼저 보여줄 분야</string>
     <string name="settings_section_info">정보</string>
     <string name="settings_privacy_policy">개인정보처리방침</string>
     <string name="settings_privacy_policy_value">보기</string>
@@ -69,7 +86,8 @@
     <string name="home_footnote">공고 내용은 원문이 우선합니다. 앱 표기와 다를 경우 각 기관 공고문을 확인해 주세요.</string>
 
     <!-- 공고 목록 -->
-    <string name="notice_list_title">임대공고</string>
+    <!-- dev2.0: 임대·분양을 함께 다루므로 탭과 같은 "공고"로 통일 -->
+    <string name="notice_list_title">공고</string>
     <string name="notice_region_label">지역</string>
     <string name="notice_region_all">전체</string>
     <string name="notice_category_label">공고 분야</string>
@@ -100,6 +118,8 @@
     <string name="notice_summary_supply">공급 호수</string>
     <string name="notice_summary_total">총 세대수</string>
     <string name="notice_detail_no_url">연결할 수 있는 공고 링크가 없습니다</string>
+    <string name="notice_favorite_add">찜하기</string>
+    <string name="notice_favorite_remove">찜 해제</string>
     <string name="notice_detail_open_map">지도에서 보기</string>
     <string name="notice_detail_no_map_app">지도 앱을 열 수 없습니다</string>
 

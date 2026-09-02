@@ -3,8 +3,9 @@ package com.ams.youthhouse.feature.main.navigation
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -13,6 +14,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.ams.youthhouse.R
 import com.ams.youthhouse.feature.home.presentation.navigation.HomeDestination
+import com.ams.youthhouse.feature.schedule.presentation.navigation.ScheduleDestination
 import com.ams.youthhouse.feature.notice.presentation.navigation.NoticeDestination
 import com.ams.youthhouse.feature.settings.presentation.navigation.SettingsDestination
 
@@ -41,10 +43,15 @@ enum class MainTab(
         labelRes = R.string.main_tab_notice,
         icon = Icons.AutoMirrored.Filled.List,
     ),
-    SETTINGS(
+    SCHEDULE(
+        destination = ScheduleDestination,
+        labelRes = R.string.main_tab_schedule,
+        icon = Icons.Filled.DateRange,
+    ),
+    MY(
         destination = SettingsDestination,
-        labelRes = R.string.main_tab_settings,
-        icon = Icons.Filled.Settings,
+        labelRes = R.string.main_tab_my,
+        icon = Icons.Filled.Person,
     ),
 }
 

@@ -7,8 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ams.youthhouse.R
 import com.ams.youthhouse.core.designsystem.component.StatusLabel
 import com.ams.youthhouse.core.designsystem.component.StatusTone
 import com.ams.youthhouse.core.designsystem.theme.AppRadius
@@ -35,12 +41,17 @@ import com.ams.youthhouse.core.notice.presentation.model.previewNoticeUiModel
  *
  * 상단에 기관·공급유형과 D-day 상태, 가운데 제목, 아래 보조 정보를 둔다.
  * 날짜를 나열하는 대신 D-day를 앞세워 급한 정도가 먼저 읽히게 한다.
+ *
+ * [onFavoriteClick]을 넘기면 제목 오른쪽에 하트가 생긴다(기획서 dev2.0 `.heart`).
+ * 홈처럼 찜과 무관한 화면은 넘기지 않으면 v1과 동일하게 그려진다.
  */
 @Composable
 fun NoticeItemCard(
     notice: NoticeUiModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isFavorite: Boolean = false,
+    onFavoriteClick: (() -> Unit)? = null,
 ) {
     Card(
         onClick = onClick,
@@ -73,30 +84,63 @@ fun NoticeItemCard(
                 }
             }
 
-            Text(
-                text = notice.title,
-                style = MaterialTheme.typography.titleMedium,
-                color = AppTheme.semanticColors.ink,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
+                verticalAlignment = Alignment.Top,
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                ) {
+                    Text(
+                        text = notice.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = AppTheme.semanticColors.ink,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
 
-            notice.subtitle?.let { subtitle ->
-                Text(
-                    text = subtitle,
-                    style = AppTextStyles.mono,
-                    color = AppTheme.semanticColors.ink70,
-                )
-            }
+                    notice.subtitle?.let { subtitle ->
+                        Text(
+                            text = subtitle,
+                            style = AppTextStyles.mono,
+                            color = AppTheme.semanticColors.ink70,
+                        )
+                    }
 
-            notice.applyPeriod?.let { period ->
-                Text(
-                    text = period,
-                    style = AppTextStyles.monoCaption,
-                    color = AppTheme.semanticColors.ink45,
-                )
+                    notice.applyPeriod?.let { period ->
+                        Text(
+                            text = period,
+                            style = AppTextStyles.monoCaption,
+                            color = AppTheme.semanticColors.ink45,
+                        )
+                    }
+                }
+
+                onFavoriteClick?.let { FavoriteHeart(isFavorite = isFavorite, onClick = it) }
             }
         }
+    }
+}
+
+@Composable
+private fun FavoriteHeart(
+    isFavorite: Boolean,
+    onClick: () -> Unit,
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+            contentDescription = stringResource(
+                if (isFavorite) R.string.notice_favorite_remove else R.string.notice_favorite_add,
+            ),
+            tint = if (isFavorite) {
+                AppTheme.semanticColors.close
+            } else {
+                AppTheme.semanticColors.ink25
+            },
+        )
     }
 }
 

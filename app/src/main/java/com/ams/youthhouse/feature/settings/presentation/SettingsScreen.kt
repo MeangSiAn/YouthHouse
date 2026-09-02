@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +23,7 @@ import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory
 import com.ams.youthhouse.core.notice.domain.model.NoticeRegion
 import com.ams.youthhouse.core.notice.presentation.model.labelRes
+import com.ams.youthhouse.feature.settings.presentation.component.PrivacyBanner
 import com.ams.youthhouse.feature.settings.presentation.component.SettingsChoiceDialog
 
 @Composable
@@ -41,6 +44,15 @@ fun SettingsScreen(
         contentPadding = PaddingValues(AppSpacing.xl),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
     ) {
+        item {
+            Text(
+                text = stringResource(R.string.main_tab_my),
+                style = MaterialTheme.typography.titleLarge,
+                color = AppTheme.semanticColors.ink,
+            )
+        }
+        item { PrivacyBanner() }
+
         item { SectionHeader(title = stringResource(R.string.settings_section_display)) }
         item {
             SettingsRowGroup {

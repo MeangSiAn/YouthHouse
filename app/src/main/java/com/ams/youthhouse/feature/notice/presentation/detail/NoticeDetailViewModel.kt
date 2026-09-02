@@ -1,17 +1,24 @@
 package com.ams.youthhouse.feature.notice.presentation.detail
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ams.youthhouse.R
+import com.ams.youthhouse.core.notice.domain.repository.FavoriteNoticeRepository
+import com.ams.youthhouse.core.notice.domain.repository.toFavoriteKey
 import com.ams.youthhouse.core.presentation.base.BaseViewModel
 import com.ams.youthhouse.feature.notice.presentation.navigation.NoticeDetailDestination
 import com.ams.youthhouse.feature.notice.presentation.navigation.noticeDetailTypeMap
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NoticeDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val favoriteNoticeRepository: FavoriteNoticeRepository,
 ) : BaseViewModel<
     NoticeDetailContract.State,
     NoticeDetailContract.Action,
@@ -25,6 +32,13 @@ class NoticeDetailViewModel @Inject constructor(
             .notice,
     ),
 ) {
+
+    init {
+        val key = currentState.notice.source.toFavoriteKey()
+        favoriteNoticeRepository.favoriteKeys
+            .onEach { keys -> updateState { copy(isFavorite = key in keys) } }
+            .launchIn(viewModelScope)
+    }
 
     private fun openUrl(url: String?) {
         if (url.isNullOrBlank()) {
@@ -54,6 +68,13 @@ class NoticeDetailViewModel @Inject constructor(
                 currentState.notice.fullAddress
                     ?.takeIf { it.isNotBlank() }
                     ?.let { sendEffect(NoticeDetailContract.Effect.OpenMap(it)) }
+            }
+
+            // 상태를 직접 뒤집지 않는다. DB에 쓰면 init의 favoriteKeys Flow가 되돌려준다.
+            NoticeDetailContract.Action.FavoriteClicked -> {
+                viewModelScope.launch {
+                    favoriteNoticeRepository.toggle(currentState.notice.source)
+                }
             }
         }
     }

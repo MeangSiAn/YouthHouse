@@ -11,12 +11,14 @@ object NoticeDetailContract {
     /** 공고 데이터는 Navigation 인자로 이미 전달받았으므로 재조회가 없다. */
     data class State(
         val notice: NoticeUiModel,
+        val isFavorite: Boolean = false,
     ) : UiState
 
     sealed interface Action : UiAction {
         data object OpenOriginalClicked : Action
         data object ApplyClicked : Action
         data object MapClicked : Action
+        data object FavoriteClicked : Action
     }
 
     sealed interface Effect : UiEffect {

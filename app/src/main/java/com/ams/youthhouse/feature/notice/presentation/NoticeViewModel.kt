@@ -7,6 +7,7 @@ import androidx.paging.map
 import com.ams.youthhouse.core.common.time.TodayProvider
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory
 import com.ams.youthhouse.core.notice.domain.model.NoticeRegion
+import com.ams.youthhouse.core.notice.domain.repository.FavoriteNoticeRepository
 import com.ams.youthhouse.core.notice.domain.repository.NoticeFilterRepository
 import com.ams.youthhouse.core.notice.domain.repository.NoticeRepository
 import com.ams.youthhouse.core.notice.presentation.model.NoticeUiModel
@@ -34,6 +35,7 @@ private data class NoticeFilter(
 class NoticeViewModel @Inject constructor(
     noticeRepository: NoticeRepository,
     private val noticeFilterRepository: NoticeFilterRepository,
+    private val favoriteNoticeRepository: FavoriteNoticeRepository,
     todayProvider: TodayProvider,
 ) : BaseViewModel<
     NoticeContract.State,
@@ -77,12 +79,23 @@ class NoticeViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+
+        favoriteNoticeRepository.favoriteKeys
+            .onEach { keys -> updateState { copy(favoriteKeys = keys) } }
+            .launchIn(viewModelScope)
     }
 
     override fun handleAction(action: NoticeContract.Action) {
         when (action) {
             is NoticeContract.Action.NoticeClicked -> {
                 sendEffect(NoticeContract.Effect.NavigateToDetail(action.notice))
+            }
+
+            // 하트도 단방향이다 — DB에 쓰면 favoriteKeys Flow가 되돌려준다.
+            is NoticeContract.Action.FavoriteClicked -> {
+                viewModelScope.launch {
+                    favoriteNoticeRepository.toggle(action.notice.source)
+                }
             }
 
             // 상태를 직접 바꾸지 않는다. 저장소에 쓰면 Flow가 되돌려준다(단방향).

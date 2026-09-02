@@ -33,6 +33,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ams.youthhouse.R
 import com.ams.youthhouse.core.designsystem.theme.AppTheme
+import com.ams.youthhouse.core.notice.domain.repository.FavoriteNoticeKey
+import com.ams.youthhouse.core.notice.domain.repository.toFavoriteKey
 import com.ams.youthhouse.core.ui.error.toUserMessageRes
 import com.ams.youthhouse.core.notice.presentation.component.NoticeCategorySpinner
 import com.ams.youthhouse.core.notice.presentation.component.NoticeItemCard
@@ -100,6 +102,7 @@ fun NoticeScreen(
 
         NoticeList(
             noticeItems = noticeItems,
+            favoriteKeys = uiState.favoriteKeys,
             onAction = onAction,
             listState = listState,
             modifier = Modifier.fillMaxSize(),
@@ -110,6 +113,7 @@ fun NoticeScreen(
 @Composable
 private fun NoticeList(
     noticeItems: LazyPagingItems<NoticeUiModel>,
+    favoriteKeys: Set<FavoriteNoticeKey>,
     onAction: (NoticeContract.Action) -> Unit,
     listState: LazyListState,
     modifier: Modifier = Modifier,
@@ -160,6 +164,10 @@ private fun NoticeList(
                                 notice = notice,
                                 onClick = {
                                     onAction(NoticeContract.Action.NoticeClicked(notice))
+                                },
+                                isFavorite = notice.source.toFavoriteKey() in favoriteKeys,
+                                onFavoriteClick = {
+                                    onAction(NoticeContract.Action.FavoriteClicked(notice))
                                 },
                             )
                         }

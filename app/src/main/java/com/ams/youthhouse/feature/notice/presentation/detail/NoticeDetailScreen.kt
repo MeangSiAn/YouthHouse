@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -88,6 +90,31 @@ fun NoticeDetailScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.notice_detail_back),
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { onAction(NoticeDetailContract.Action.FavoriteClicked) },
+                    ) {
+                        Icon(
+                            imageVector = if (uiState.isFavorite) {
+                                Icons.Filled.Favorite
+                            } else {
+                                Icons.Filled.FavoriteBorder
+                            },
+                            contentDescription = stringResource(
+                                if (uiState.isFavorite) {
+                                    R.string.notice_favorite_remove
+                                } else {
+                                    R.string.notice_favorite_add
+                                },
+                            ),
+                            tint = if (uiState.isFavorite) {
+                                AppTheme.semanticColors.close
+                            } else {
+                                AppTheme.semanticColors.ink45
+                            },
                         )
                     }
                 },
