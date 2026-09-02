@@ -12,9 +12,6 @@ interface FavoriteNoticeDao {
     @Query("SELECT * FROM favorite_notice ORDER BY savedAtMillis DESC")
     fun observeAll(): Flow<List<FavoriteNoticeEntity>>
 
-    @Query("SELECT `key` FROM favorite_notice")
-    fun observeKeys(): Flow<List<String>>
-
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_notice WHERE `key` = :key)")
     suspend fun exists(key: String): Boolean
 

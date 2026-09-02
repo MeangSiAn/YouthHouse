@@ -25,6 +25,7 @@ import com.ams.youthhouse.core.designsystem.component.SectionHeader
 import com.ams.youthhouse.core.designsystem.theme.AppSpacing
 import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory
+import com.ams.youthhouse.core.notice.domain.repository.toFavoriteKey
 import com.ams.youthhouse.core.notice.presentation.component.NoticeItemCard
 import com.ams.youthhouse.core.notice.presentation.model.NoticeStatus
 import com.ams.youthhouse.core.notice.presentation.model.NoticeUiModel
@@ -117,14 +118,11 @@ private fun LazyListScope.noticeCards(
     keyPrefix: String,
     onAction: (ScheduleContract.Action) -> Unit,
 ) {
-    // 찜 목록은 (category, pblancId)가 고유해 안정 키를 줄 수 있다.
+    // 찜은 행 단위 키(FavoriteNoticeKey)가 고유해 안정 키를 줄 수 있다.
     // 하트를 꺼서 항목이 빠질 때 아래 카드들이 자연스럽게 따라 올라온다.
     items(
         count = notices.size,
-        key = { index ->
-            val n = notices[index].source
-            "$keyPrefix:${n.category.name}:${n.pblancId}"
-        },
+        key = { index -> "$keyPrefix:${notices[index].source.toFavoriteKey()}" },
     ) { index ->
         val notice = notices[index]
         NoticeItemCard(

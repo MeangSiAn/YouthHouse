@@ -7,7 +7,7 @@ import com.ams.youthhouse.core.notice.domain.model.NoticeAddress
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory
 import com.ams.youthhouse.core.notice.domain.model.NoticePeriod
 import com.ams.youthhouse.core.notice.domain.model.NoticePrice
-import com.ams.youthhouse.core.notice.domain.repository.FavoriteNoticeKey
+import com.ams.youthhouse.core.notice.domain.repository.toFavoriteKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -43,20 +43,35 @@ class FavoriteNoticeRepositoryImplTest {
     }
 
     @Test
-    fun `키는 분야와 공고 ID로 만들어진다`() = runTest {
-        repository.toggle(notice("21096", NoticeCategory.RENTAL))
-        repository.toggle(notice("21096", NoticeCategory.SALE))
+    fun `같은 공고라도 시군구가 다른 행은 별개의 찜이다`() = runTest {
+        // 이 API는 한 공고를 시군구별 행으로 쪼개 내려보낸다.
+        // 영통구 행을 찜했는데 기흥구 행까지 켜지면 안 된다.
+        repository.toggle(notice("21096", districtName = "수원시 영통구"))
 
         val keys = repository.favoriteKeys.first()
 
-        // 같은 pblancId라도 분야가 다르면 서로 다른 찜이다 (두 API의 ID 시퀀스가 별개라서)
-        assertEquals(
-            setOf(
-                FavoriteNoticeKey(NoticeCategory.RENTAL, "21096"),
-                FavoriteNoticeKey(NoticeCategory.SALE, "21096"),
-            ),
-            keys,
-        )
+        assertTrue(keys.single().districtName == "수원시 영통구")
+        assertTrue(notice("21096", districtName = "용인시 기흥구").toFavoriteKey() !in keys)
+    }
+
+    @Test
+    fun `같은 행을 다시 토글하면 그 행만 해제된다`() = runTest {
+        repository.toggle(notice("21096", districtName = "수원시 영통구"))
+        repository.toggle(notice("21096", districtName = "용인시 기흥구"))
+
+        repository.toggle(notice("21096", districtName = "수원시 영통구"))
+
+        val remaining = repository.favorites.first()
+        assertEquals(listOf("용인시 기흥구"), remaining.map { it.address.districtName })
+    }
+
+    @Test
+    fun `분야가 다르면 같은 pblancId라도 별개의 찜이다`() = runTest {
+        // 두 API의 ID 시퀀스가 별개라 미래 충돌을 배제할 수 없다.
+        repository.toggle(notice("21096", NoticeCategory.RENTAL))
+        repository.toggle(notice("21096", NoticeCategory.SALE))
+
+        assertEquals(2, repository.favoriteKeys.first().size)
     }
 
     @Test
@@ -78,6 +93,7 @@ class FavoriteNoticeRepositoryImplTest {
     private fun notice(
         pblancId: String,
         category: NoticeCategory = NoticeCategory.RENTAL,
+        districtName: String = "울주군",
     ): Notice = Notice(
         category = category,
         pblancId = pblancId,
@@ -89,7 +105,7 @@ class FavoriteNoticeRepositoryImplTest {
         supplyTypeName = null,
         previousNoticeId = null,
         complexName = "단지",
-        address = NoticeAddress("울산광역시", "울주군", "울산 울주군 1", null, null, "pnu"),
+        address = NoticeAddress("울산광역시", districtName, "울산 울주군 1", null, null, "pnu"),
         period = NoticePeriod("20260814", "20260818", "20261231", "20270131"),
         price = NoticePrice(null, 6_000_000, 56_588_000, 115_180_000, null),
         heatingMethodName = "개별난방",
@@ -110,8 +126,6 @@ private class FakeFavoriteNoticeDao : FavoriteNoticeDao {
 
     override fun observeAll(): Flow<List<FavoriteNoticeEntity>> =
         rows.map { it.values.sortedByDescending(FavoriteNoticeEntity::savedAtMillis) }
-
-    override fun observeKeys(): Flow<List<String>> = rows.map { it.keys.toList() }
 
     override suspend fun exists(key: String): Boolean = key in rows.value
 

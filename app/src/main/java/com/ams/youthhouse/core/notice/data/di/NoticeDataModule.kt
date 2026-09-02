@@ -41,7 +41,11 @@ object NoticeDatabaseModule {
         context,
         NoticeDatabase::class.java,
         "notice.db",
-    ).build()
+    )
+        // 아직 스토어에 나간 적 없는 DB다. 마이그레이션 대신 비우는 게 맞고,
+        // 첫 출시 이후에는 이 호출을 제거하고 Migration을 작성해야 한다.
+        .fallbackToDestructiveMigration(dropAllTables = true)
+        .build()
 
     @Provides
     fun provideFavoriteNoticeDao(database: NoticeDatabase): FavoriteNoticeDao =
