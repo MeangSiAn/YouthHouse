@@ -1,5 +1,7 @@
 package com.ams.youthhouse.core.notice.domain.model
 
+import kotlinx.serialization.Serializable
+
 /**
  * 공공임대주택 모집공고 한 건.
  *
@@ -8,6 +10,7 @@ package com.ams.youthhouse.core.notice.domain.model
  * (`signguNm`·`sumSuplyCo`만 다름), 32개 필드가 완전히 동일한 행도 존재한다.
  * 따라서 `pblancId`도, `(pblancId, houseSn)` 조합도 목록 항목의 키가 될 수 없다.
  * 목록 UI는 위치 기반 키를 쓰고, 상세 화면은 모델 자체를 전달받는다.
+ * 단, **공고 단위**로는 `(category, pblancId)`가 유효하다 — 찜이 이 키를 쓴다.
  *
  * ## 날짜
  * `YYYYMMDD` 원문을 유지한다. 사전순 비교가 곧 시간순 비교라
@@ -15,7 +18,12 @@ package com.ams.youthhouse.core.notice.domain.model
  *
  * ## 빈 값
  * API는 값 없음을 `null`이 아니라 빈 문자열/0으로 준다. 매퍼가 `null`로 정규화한다.
+ *
+ * ## [Serializable]인 이유
+ * 이 API는 식별자로 재조회할 방법이 없어, 찜은 모델 스냅숏 자체를 저장한다.
+ * kotlinx.serialization은 순수 Kotlin이라 domain 순수성 규칙과 충돌하지 않는다.
  */
+@Serializable
 data class Notice(
     val category: NoticeCategory,
     val pblancId: String,
@@ -56,6 +64,7 @@ data class Notice(
     }
 }
 
+@Serializable
 data class NoticeAddress(
     val provinceName: String?,
     val districtName: String?,
@@ -65,6 +74,7 @@ data class NoticeAddress(
     val pnu: String?,
 )
 
+@Serializable
 data class NoticePeriod(
     val noticeDate: String?,
     val beginDate: String?,
@@ -72,6 +82,7 @@ data class NoticePeriod(
     val winnerAnnounceDate: String?,
 )
 
+@Serializable
 data class NoticePrice(
     val minDeposit: Int?,
     val minDownPayment: Int?,

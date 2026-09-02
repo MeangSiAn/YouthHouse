@@ -165,6 +165,10 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
 
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
     // Compose 전용 앱이라 paging-runtime(recyclerview·livedata 동반) 대신 common + compose만 쓴다.
     implementation(libs.androidx.paging.common)
     implementation(libs.androidx.paging.compose)

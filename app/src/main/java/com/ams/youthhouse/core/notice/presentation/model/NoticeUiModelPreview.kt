@@ -1,6 +1,10 @@
 package com.ams.youthhouse.core.notice.presentation.model
 
+import com.ams.youthhouse.core.notice.domain.model.Notice
+import com.ams.youthhouse.core.notice.domain.model.NoticeAddress
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory
+import com.ams.youthhouse.core.notice.domain.model.NoticePeriod
+import com.ams.youthhouse.core.notice.domain.model.NoticePrice
 
 /**
  * `@Preview`용 고정 데이터.
@@ -17,6 +21,7 @@ fun previewNoticeUiModel(
     regionName: String? = "울산광역시 중구",
     applyPeriod: String? = "2026.08.10 ~ 2026.08.11",
 ): NoticeUiModel = NoticeUiModel(
+    source = previewNotice(category = category, title = title),
     category = category,
     title = title,
     status = status,
@@ -51,4 +56,50 @@ fun previewNoticeUiModel(
         ),
         NoticeScheduleStage(ScheduleStageKind.RESULT, ScheduleStageState.UPCOMING, "2026.10.02"),
     ),
+)
+
+fun previewNotice(
+    category: NoticeCategory = NoticeCategory.RENTAL,
+    pblancId: String = "21096",
+    title: String = "[울산권] 2026년 기존주택등 매입임대주택 입주자 모집 공고",
+): Notice = Notice(
+    category = category,
+    pblancId = pblancId,
+    houseSn = 0,
+    title = title,
+    statusName = "일반공고",
+    supplyInstitutionName = "LH",
+    houseTypeName = "다가구주택",
+    supplyTypeName = "매입임대",
+    previousNoticeId = null,
+    complexName = null,
+    address = NoticeAddress(
+        provinceName = "울산광역시",
+        districtName = "중구",
+        fullAddress = null,
+        roadName = null,
+        legalDongName = null,
+        pnu = null,
+    ),
+    period = NoticePeriod(
+        noticeDate = "20260709",
+        beginDate = "20260810",
+        endDate = "20260811",
+        winnerAnnounceDate = "20261002",
+    ),
+    price = NoticePrice(
+        minDeposit = 12_000_000,
+        minDownPayment = null,
+        minInterimPayment = null,
+        minBalance = null,
+        minMonthlyRent = 150_000,
+    ),
+    heatingMethodName = "개별난방",
+    totalHouseholdCount = null,
+    supplyCount = 3,
+    supplyHouseCount = null,
+    contact = "LH 콜센터 : 1600-1004",
+    noticeUrl = "https://apply.lh.or.kr",
+    pcUrl = "https://www.myhome.go.kr",
+    mobileUrl = "https://m.myhome.go.kr",
 )

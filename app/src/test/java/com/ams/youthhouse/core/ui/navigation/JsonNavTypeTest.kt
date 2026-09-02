@@ -6,6 +6,7 @@ import com.ams.youthhouse.core.notice.presentation.model.NoticeStatus
 import com.ams.youthhouse.core.notice.presentation.model.ScheduleStageKind
 import com.ams.youthhouse.core.notice.presentation.model.ScheduleStageState
 import com.ams.youthhouse.core.notice.presentation.model.NoticeUiModel
+import com.ams.youthhouse.core.notice.presentation.model.previewNotice
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -52,6 +53,8 @@ class JsonNavTypeTest {
     }
 
     private fun sampleNotice() = NoticeUiModel(
+        // 실데이터 원형까지 함께 실려 왕복돼야 한다 — 찜이 source에 의존한다.
+        source = previewNotice(),
         category = NoticeCategory.RENTAL,
         title = "[울산권] 2026년 매입임대주택 입주자 모집 공고(1순위일반 & 2순위) #특수/문자?=+",
         status = NoticeStatus.URGENT,

@@ -23,6 +23,11 @@ enum class NoticeStatus { OPEN, URGENT, UPCOMING, CLOSED, UNKNOWN }
  */
 @Serializable
 data class NoticeUiModel(
+    /**
+     * 포맷 전의 도메인 원본. 찜처럼 "이 공고 자체"가 필요한 동작에 쓴다.
+     * 포맷된 필드에서 도메인 모델을 역산할 수 없어서 원본을 함께 실어 보낸다.
+     */
+    val source: Notice,
     val category: NoticeCategory,
     val title: String,
     val status: NoticeStatus,
@@ -67,6 +72,7 @@ fun Notice.toUiModel(today: String): NoticeUiModel {
     val (status, statusLabel) = resolveStatus(today)
 
     return NoticeUiModel(
+        source = this,
         category = category,
         title = title,
         status = status,
