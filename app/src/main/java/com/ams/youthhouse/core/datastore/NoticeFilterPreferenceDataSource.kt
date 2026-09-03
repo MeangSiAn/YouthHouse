@@ -13,14 +13,14 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * 공고 목록 필터(지역·분야)를 원시 문자열로 읽고 쓴다.
+ * 공고 목록 필터(지역·분야·접수 상태)를 원시 문자열로 읽고 쓴다.
  *
  * 지역은 enum 상수명이 아니라 **API 코드**("11")를 저장한다.
  * 코드는 서버 계약이라 바뀌지 않지만 enum 상수명은 리팩터링 한 번에 바뀌고,
  * 그러면 사용자가 저장해 둔 값이 조용히 깨진다.
  *
  * 지역의 "전체"는 키를 지우는 것으로 표현한다.
- * 분야는 항상 하나가 선택돼 있으므로 키가 없으면 호출부가 기본값을 정한다.
+ * 분야와 접수 상태는 항상 하나가 선택돼 있으므로 키가 없으면 호출부가 기본값을 정한다.
  */
 @Singleton
 class NoticeFilterPreferenceDataSource @Inject constructor(
@@ -37,6 +37,8 @@ class NoticeFilterPreferenceDataSource @Inject constructor(
 
     val selectedCategoryName: Flow<String?> = preferences.map { it[SELECTED_CATEGORY] }
 
+    val selectedStatusFilterName: Flow<String?> = preferences.map { it[SELECTED_STATUS_FILTER] }
+
     suspend fun setSelectedRegionCode(code: String?) {
         dataStore.edit { preferences ->
             if (code == null) {
@@ -51,8 +53,13 @@ class NoticeFilterPreferenceDataSource @Inject constructor(
         dataStore.edit { preferences -> preferences[SELECTED_CATEGORY] = name }
     }
 
+    suspend fun setSelectedStatusFilterName(name: String) {
+        dataStore.edit { preferences -> preferences[SELECTED_STATUS_FILTER] = name }
+    }
+
     private companion object {
         val SELECTED_REGION_CODE = stringPreferencesKey("selected_region_code")
         val SELECTED_CATEGORY = stringPreferencesKey("selected_notice_category")
+        val SELECTED_STATUS_FILTER = stringPreferencesKey("selected_notice_status_filter")
     }
 }

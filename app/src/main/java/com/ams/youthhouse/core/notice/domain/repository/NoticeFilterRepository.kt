@@ -2,6 +2,7 @@ package com.ams.youthhouse.core.notice.domain.repository
 
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory
 import com.ams.youthhouse.core.notice.domain.model.NoticeRegion
+import com.ams.youthhouse.core.notice.domain.model.NoticeStatusFilter
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -18,7 +19,12 @@ interface NoticeFilterRepository {
     /** 분야는 "전체"가 없다. 저장된 값이 없으면 [NoticeCategory.RENTAL]. */
     val selectedCategory: Flow<NoticeCategory>
 
+    /** 접수 상태 필터. 저장된 값이 없으면 [NoticeStatusFilter.Default]. */
+    val selectedStatusFilter: Flow<NoticeStatusFilter>
+
     suspend fun setSelectedRegion(region: NoticeRegion?)
 
     suspend fun setSelectedCategory(category: NoticeCategory)
+
+    suspend fun setSelectedStatusFilter(filter: NoticeStatusFilter)
 }

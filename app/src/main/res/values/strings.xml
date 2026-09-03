@@ -210,6 +210,9 @@
     <string name="notice_category_label">공고 분야</string>
     <string name="notice_category_rental">공공임대</string>
     <string name="notice_category_sale">공공분양</string>
+    <string name="notice_status_open">접수중</string>
+    <string name="notice_status_upcoming">접수 예정</string>
+    <string name="notice_status_all">마감 포함</string>
     <string name="notice_empty">조회된 모집공고가 없습니다</string>
 
     <!-- 공고 상세 -->

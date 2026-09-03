@@ -3,13 +3,16 @@ package com.ams.youthhouse.feature.notice.presentation
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.filter
 import androidx.paging.map
 import com.ams.youthhouse.core.common.time.TodayProvider
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory
 import com.ams.youthhouse.core.notice.domain.model.NoticeRegion
+import com.ams.youthhouse.core.notice.domain.model.NoticeStatusFilter
 import com.ams.youthhouse.core.notice.domain.repository.FavoriteNoticeRepository
 import com.ams.youthhouse.core.notice.domain.repository.NoticeFilterRepository
 import com.ams.youthhouse.core.notice.domain.repository.NoticeRepository
+import com.ams.youthhouse.core.notice.presentation.model.NoticeStatus
 import com.ams.youthhouse.core.notice.presentation.model.NoticeUiModel
 import com.ams.youthhouse.core.notice.presentation.model.toUiModel
 import com.ams.youthhouse.core.presentation.base.BaseViewModel
@@ -28,7 +31,16 @@ import javax.inject.Inject
 private data class NoticeFilter(
     val category: NoticeCategory,
     val region: NoticeRegion?,
+    val status: NoticeStatusFilter,
 )
+
+/** 상태 필터가 이 공고를 통과시키는지. [NoticeStatusFilter.ALL]은 아무것도 거르지 않는다. */
+private fun NoticeStatusFilter.accepts(status: NoticeStatus): Boolean = when (this) {
+    // 마감 임박(URGENT)도 접수 중이다. 급한 것만 따로 빼면 목록에서 사라져 보인다.
+    NoticeStatusFilter.OPEN -> status == NoticeStatus.OPEN || status == NoticeStatus.URGENT
+    NoticeStatusFilter.UPCOMING -> status == NoticeStatus.UPCOMING
+    NoticeStatusFilter.ALL -> true
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -48,7 +60,8 @@ class NoticeViewModel @Inject constructor(
     private val filter: Flow<NoticeFilter> = combine(
         noticeFilterRepository.selectedCategory,
         noticeFilterRepository.selectedRegion,
-    ) { category, region -> NoticeFilter(category, region) }
+        noticeFilterRepository.selectedStatusFilter,
+    ) { category, region, status -> NoticeFilter(category, region, status) }
         .distinctUntilChanged()
 
     /**
@@ -59,21 +72,28 @@ class NoticeViewModel @Inject constructor(
      * DataStore Flow는 값이 준비되기 전에는 emit하지 않으므로 여기서 기다린다.
      */
     val noticePagingData: Flow<PagingData<NoticeUiModel>> = filter
-        .flatMapLatest { (category, region) -> noticeRepository.getNotices(category, region) }
-        // D-day는 "지금"이 있어야 계산된다. Flow 조립 시점에 한 번 읽어 페이지마다 재계산하지 않는다.
-        .map { pagingData ->
-            val today = todayProvider.today()
-            pagingData.map { notice -> notice.toUiModel(today) }
+        .flatMapLatest { (category, region, status) ->
+            noticeRepository.getNotices(category, region)
+                // D-day는 "지금"이 있어야 계산된다. Flow 조립 시점에 한 번 읽어 페이지마다 재계산하지 않는다.
+                .map { pagingData ->
+                    val today = todayProvider.today()
+                    pagingData
+                        .map { notice -> notice.toUiModel(today) }
+                        // 상태는 날짜와 오늘을 비교해야 나오는 파생값이라 서버에 맡길 수 없다.
+                        // 걸러서 페이지가 비어도 Paging이 다음 페이지를 이어 불러온다.
+                        .filter { notice -> status.accepts(notice.status) }
+                }
         }
         .cachedIn(viewModelScope)
 
     init {
         filter
-            .onEach { (category, region) ->
+            .onEach { (category, region, status) ->
                 updateState {
                     copy(
                         selectedCategory = category,
                         selectedRegion = region,
+                        selectedStatus = status,
                         isFilterLoaded = true,
                     )
                 }
@@ -108,6 +128,12 @@ class NoticeViewModel @Inject constructor(
             is NoticeContract.Action.CategorySelected -> {
                 viewModelScope.launch {
                     noticeFilterRepository.setSelectedCategory(action.category)
+                }
+            }
+
+            is NoticeContract.Action.StatusSelected -> {
+                viewModelScope.launch {
+                    noticeFilterRepository.setSelectedStatusFilter(action.status)
                 }
             }
         }

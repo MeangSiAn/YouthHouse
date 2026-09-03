@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,9 +35,8 @@ import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.core.notice.domain.repository.FavoriteNoticeKey
 import com.ams.youthhouse.core.notice.domain.repository.toFavoriteKey
 import com.ams.youthhouse.core.ui.error.toUserMessageRes
-import com.ams.youthhouse.core.notice.presentation.component.NoticeCategorySpinner
+import com.ams.youthhouse.core.notice.presentation.component.NoticeFilterChips
 import com.ams.youthhouse.core.notice.presentation.component.NoticeItemCard
-import com.ams.youthhouse.core.notice.presentation.component.NoticeRegionSpinner
 import com.ams.youthhouse.core.notice.presentation.model.NoticeUiModel
 import com.ams.youthhouse.core.notice.presentation.model.previewNoticeUiModel
 import kotlinx.coroutines.flow.flowOf
@@ -58,7 +56,8 @@ fun NoticeScreen(
     // 상세를 보고 뒤로 오면 이 화면이 컴포지션에 재진입하는데, 그때도 초기화하면
     // rememberLazyListState가 복원해 둔 위치를 덮어써서 목록이 맨 위로 튄다.
     // 그래서 마지막으로 적용한 필터를 따로 기억해 두고 실제로 달라졌을 때만 스크롤한다.
-    val filterKey = "${uiState.selectedCategory}:${uiState.selectedRegion?.code.orEmpty()}"
+    val filterKey =
+        "${uiState.selectedCategory}:${uiState.selectedRegion?.code.orEmpty()}:${uiState.selectedStatus}"
     var appliedFilterKey by rememberSaveable { mutableStateOf(filterKey) }
 
     LaunchedEffect(filterKey) {
@@ -75,30 +74,24 @@ fun NoticeScreen(
             text = stringResource(R.string.notice_list_title),
             style = MaterialTheme.typography.titleLarge,
             color = AppTheme.semanticColors.ink,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            NoticeCategorySpinner(
-                selectedCategory = uiState.selectedCategory,
-                onCategorySelected = { category ->
-                    onAction(NoticeContract.Action.CategorySelected(category))
-                },
-                modifier = Modifier.weight(1f),
-            )
-            NoticeRegionSpinner(
-                selectedRegion = uiState.selectedRegion,
-                onRegionSelected = { region ->
-                    onAction(NoticeContract.Action.RegionSelected(region))
-                },
-                modifier = Modifier.weight(1f),
-            )
-        }
+        NoticeFilterChips(
+            selectedRegion = uiState.selectedRegion,
+            selectedCategory = uiState.selectedCategory,
+            selectedStatus = uiState.selectedStatus,
+            onRegionSelected = { region ->
+                onAction(NoticeContract.Action.RegionSelected(region))
+            },
+            onCategorySelected = { category ->
+                onAction(NoticeContract.Action.CategorySelected(category))
+            },
+            onStatusSelected = { status ->
+                onAction(NoticeContract.Action.StatusSelected(status))
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         NoticeList(
             noticeItems = noticeItems,
