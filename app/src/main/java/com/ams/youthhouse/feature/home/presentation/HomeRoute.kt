@@ -7,6 +7,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ams.youthhouse.core.notice.presentation.model.NoticeUiModel
 import com.ams.youthhouse.core.ui.extension.CollectUiEffect
+import com.ams.youthhouse.feature.home.presentation.guide.HomeGuide
 
 @Composable
 fun HomeRoute(
@@ -15,6 +16,9 @@ fun HomeRoute(
     onSeeAllScheduleClick: () -> Unit,
     onComplexClick: (String, String) -> Unit,
     onSeeAllComplexesClick: () -> Unit,
+    onVisitNoteClick: (kaptCode: String, name: String) -> Unit,
+    onCompareVisitsClick: () -> Unit,
+    onGuideClick: (HomeGuide) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -28,6 +32,10 @@ fun HomeRoute(
             is HomeContract.Effect.NavigateToComplexDetail ->
                 onComplexClick(effect.kaptCode, effect.name)
             HomeContract.Effect.NavigateToTrade -> onSeeAllComplexesClick()
+            is HomeContract.Effect.NavigateToVisitNote ->
+                onVisitNoteClick(effect.kaptCode, effect.name)
+            HomeContract.Effect.NavigateToVisitCompare -> onCompareVisitsClick()
+            is HomeContract.Effect.NavigateToGuide -> onGuideClick(effect.guide)
         }
     }
 

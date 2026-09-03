@@ -6,7 +6,9 @@ import com.ams.youthhouse.core.notice.presentation.model.NoticeUiModel
 import com.ams.youthhouse.core.presentation.contract.UiAction
 import com.ams.youthhouse.core.presentation.contract.UiEffect
 import com.ams.youthhouse.core.presentation.contract.UiState
+import com.ams.youthhouse.feature.home.presentation.guide.HomeGuide
 import com.ams.youthhouse.feature.home.presentation.model.HomeSummaryUiModel
+import com.ams.youthhouse.feature.home.presentation.model.HomeVisitUiModel
 import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
 
 /** 홈이 그리는 세 가지 화면. 기획서 SCREEN 02 / 10 / 01에 대응한다. */
@@ -36,7 +38,14 @@ object HomeContract {
         /** 관심 단지 몇 곳. 실거래가는 싣지 않는다 — 단지마다 상세를 한 번씩 더 불러야 한다. */
         val favoriteComplexes: List<FavoriteComplex> = emptyList(),
         val favoriteComplexCount: Int = 0,
+        /** 임장기록 블록 — 예정 → 미완 → 최근 순으로 몇 건. */
+        val visits: List<HomeVisitUiModel> = emptyList(),
+        val visitCount: Int = 0,
+        val isVisitsLoaded: Boolean = false,
     ) : UiState {
+
+        val canCompareVisits: Boolean
+            get() = visitCount >= MIN_VISITS_TO_COMPARE
 
         val mode: HomeMode
             get() = when {
@@ -53,6 +62,9 @@ object HomeContract {
         data object SeeAllScheduleClicked : Action
         data class ComplexClicked(val complex: FavoriteComplex) : Action
         data object SeeAllComplexesClicked : Action
+        data class VisitClicked(val visit: HomeVisitUiModel) : Action
+        data object CompareVisitsClicked : Action
+        data class GuideClicked(val guide: HomeGuide) : Action
         data object RetryClicked : Action
     }
 
@@ -62,5 +74,10 @@ object HomeContract {
         data object NavigateToSchedule : Effect
         data class NavigateToComplexDetail(val kaptCode: String, val name: String) : Effect
         data object NavigateToTrade : Effect
+        data class NavigateToVisitNote(val kaptCode: String, val name: String) : Effect
+        data object NavigateToVisitCompare : Effect
+        data class NavigateToGuide(val guide: HomeGuide) : Effect
     }
+
+    const val MIN_VISITS_TO_COMPARE = 2
 }

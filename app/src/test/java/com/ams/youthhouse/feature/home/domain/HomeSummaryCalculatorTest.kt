@@ -114,6 +114,21 @@ class HomeSummaryCalculatorTest {
         assertEquals("20260816", summary.nextOpenDate)
     }
 
+    /** 기획서 SCREEN 03 "곧 열릴 공고" — 접수중이 없는 달에 기다릴 거리를 남긴다. */
+    @Test
+    fun `곧 열릴 공고는 시작일이 이른 순으로 상한만큼 담는다`() {
+        val notices = listOf(
+            upcomingNotice(pblancId = "late", begin = "20261001"),
+            upcomingNotice(pblancId = "soon", begin = "20260816"),
+            upcomingNotice(pblancId = "mid", begin = "20260901"),
+            openNotice(pblancId = "open", end = "20260810"),
+        )
+
+        val summary = notices.toHomeSummary(TODAY)
+
+        assertEquals(listOf("soon", "mid"), summary.upcomingNotices.map { it.pblancId })
+    }
+
     @Test
     fun `기간이 비어 있는 공고는 어느 쪽으로도 세지 않는다`() {
         val summary = listOf(

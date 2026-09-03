@@ -25,6 +25,8 @@ data class HomeSummary(
     val closingTodayCount: Int,
     /** 접수 예정 중 가장 이른 시작일 (`YYYYMMDD`). 접수중이 없을 때 다음 시기를 알린다. */
     val nextOpenDate: String?,
+    /** 접수 예정 공고를 시작일이 이른 순으로 몇 건 (상한 적용). 접수중이 없을 때 "곧 열릴 공고"로 쓴다. */
+    val upcomingNotices: List<Notice>,
 ) {
     val hasOpenNotice: Boolean get() = openCount > 0
 }

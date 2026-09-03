@@ -23,6 +23,7 @@ data class HomeSummaryUiModel(
     /** "2026.08.16" — 다음 접수 시작일. */
     val nextOpenDate: String?,
     val hasOpenNotice: Boolean,
+    val upcomingNotices: List<NoticeUiModel> = emptyList(),
 )
 
 fun HomeSummary.toUiModel(today: String): HomeSummaryUiModel = HomeSummaryUiModel(
@@ -41,4 +42,5 @@ fun HomeSummary.toUiModel(today: String): HomeSummaryUiModel = HomeSummaryUiMode
     closingTodayCount = closingTodayCount,
     nextOpenDate = nextOpenDate.formatYearMonthDay(),
     hasOpenNotice = hasOpenNotice,
+    upcomingNotices = upcomingNotices.map { it.toUiModel(today) },
 )

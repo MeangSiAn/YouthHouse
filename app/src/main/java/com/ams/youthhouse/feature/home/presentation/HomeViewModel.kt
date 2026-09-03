@@ -12,11 +12,14 @@ import com.ams.youthhouse.core.notice.domain.repository.NoticeFilterRepository
 import com.ams.youthhouse.core.notice.domain.repository.NoticeRepository
 import com.ams.youthhouse.core.presentation.base.BaseViewModel
 import com.ams.youthhouse.core.ui.error.toUserMessageRes
+import com.ams.youthhouse.feature.home.domain.pickForHome
 import com.ams.youthhouse.feature.home.domain.toHomeSummary
 import com.ams.youthhouse.core.notice.presentation.model.NoticeStatus
 import com.ams.youthhouse.core.notice.presentation.model.toUiModel as toNoticeUiModel
+import com.ams.youthhouse.feature.home.presentation.model.toHomeVisitUiModel
 import com.ams.youthhouse.feature.home.presentation.model.toUiModel
 import com.ams.youthhouse.feature.trade.domain.repository.FavoriteComplexRepository
+import com.ams.youthhouse.feature.trade.domain.repository.SiteVisitNoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -36,6 +39,7 @@ class HomeViewModel @Inject constructor(
     // 화면·구현에는 의존하지 않으므로 단지 상세로 가는 길은 navigation 콜백이 잇는다.
     favoriteNoticeRepository: FavoriteNoticeRepository,
     favoriteComplexRepository: FavoriteComplexRepository,
+    siteVisitNoteRepository: SiteVisitNoteRepository,
     private val todayProvider: TodayProvider,
 ) : BaseViewModel<
     HomeContract.State,
@@ -78,6 +82,19 @@ class HomeViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+
+        siteVisitNoteRepository.notes
+            .onEach { notes ->
+                val today = todayProvider.today()
+                updateState {
+                    copy(
+                        visits = notes.pickForHome(today).map { it.toHomeVisitUiModel(today) },
+                        visitCount = notes.size,
+                        isVisitsLoaded = true,
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     override fun handleAction(action: HomeContract.Action) {
@@ -112,6 +129,23 @@ class HomeViewModel @Inject constructor(
 
             HomeContract.Action.SeeAllComplexesClicked -> {
                 sendEffect(HomeContract.Effect.NavigateToTrade)
+            }
+
+            is HomeContract.Action.VisitClicked -> {
+                sendEffect(
+                    HomeContract.Effect.NavigateToVisitNote(
+                        kaptCode = action.visit.kaptCode,
+                        name = action.visit.complexName,
+                    ),
+                )
+            }
+
+            HomeContract.Action.CompareVisitsClicked -> {
+                sendEffect(HomeContract.Effect.NavigateToVisitCompare)
+            }
+
+            is HomeContract.Action.GuideClicked -> {
+                sendEffect(HomeContract.Effect.NavigateToGuide(action.guide))
             }
 
             HomeContract.Action.RetryClicked -> load(currentState.selectedRegion)

@@ -62,6 +62,10 @@ fun List<Notice>.toHomeSummary(
         upcomingCount = upcoming.size,
         closingTodayCount = open.count { it.period.endDate == today },
         nextOpenDate = upcoming.mapNotNull { it.period.beginDate }.minOrNull(),
+        // 기획서 SCREEN 03 "곧 열릴 공고" — 접수중이 없는 달에 기다릴 거리를 남긴다.
+        upcomingNotices = upcoming
+            .sortedBy { it.period.beginDate.orEmpty() }
+            .take(todayNoticeLimit),
     )
 }
 

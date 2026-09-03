@@ -210,6 +210,80 @@
     <string name="home_empty_change_region">다른 지역 보기</string>
     <string name="home_empty_see_all">전체 공고 둘러보기</string>
 
+    <string name="home_section_upcoming_notice">곧 열릴 공고</string>
+    <string name="home_section_upcoming_more">예정 %1$d건</string>
+
+    <!-- 홈 · 임장기록 -->
+    <string name="home_block_visit">임장기록</string>
+    <string name="home_section_visits">최근 임장</string>
+    <string name="home_section_visits_more">%1$d곳 · 매매</string>
+    <string name="home_visit_compare">임장한 %1$d곳 비교하기</string>
+    <string name="home_visit_planned">임장 예정</string>
+    <string name="home_visit_planned_date">%1$s 방문 예정</string>
+    <string name="home_visit_done_summary">%1$s 방문 · 점검 %2$d/%3$d</string>
+    <string name="home_visit_incomplete">기록 미완 · 기억이 사라지기 전에 마저 채우기</string>
+    <string name="home_visit_empty_title">아직 기록한 임장이 없습니다</string>
+    <string name="home_visit_empty_description">집을 보러 가기 전에 단지를 찾아 두면\n현장에서 점검 항목을 빠뜨리지 않고 볼 수 있습니다.</string>
+    <string name="home_visit_empty_action">매매 탭에서 단지 찾기</string>
+
+    <!-- 홈 · 알아두면 좋은 것 -->
+    <string name="home_section_guides">알아두면 좋은 것</string>
+    <string name="guide_footnote">일반적인 안내입니다. 조건과 절차는 공고마다 다르므로 공고문이 우선합니다.</string>
+    <string name="guide_tag_basics">가이드</string>
+    <string name="guide_tag_visit">임장</string>
+    <string name="guide_tag_prepare">준비</string>
+
+    <string name="guide_rental_types_title">매입임대와 전세임대,\n뭐가 다를까</string>
+    <string name="guide_rental_types_lead">둘 다 LH·지방공사가 청년에게 시세보다 싸게 빌려주는 집입니다. 가장 큰 차이는 집을 누가 고르느냐입니다.</string>
+    <string-array name="guide_rental_types_point_titles">
+        <item>매입임대 — 공사가 사 둔 집</item>
+        <item>전세임대 — 내가 고르는 집</item>
+        <item>비용 구조가 다르다</item>
+        <item>무엇을 고를까</item>
+    </string-array>
+    <string-array name="guide_rental_types_point_bodies">
+        <item>공사가 이미 사들인 다세대·오피스텔에 들어갑니다. 공고에 단지와 호수가 정해져 있어 고를 폭은 좁지만, 계약이 단순하고 시세보다 훨씬 낮은 임대료로 삽니다.</item>
+        <item>당첨되면 정해진 한도 안에서 살고 싶은 집을 직접 찾고, 공사가 집주인과 전세계약을 맺어 다시 빌려줍니다. 원하는 동네에 살 수 있지만 매물을 물색하고 권리관계를 확인하는 일은 내 몫입니다.</item>
+        <item>매입임대는 보증금과 월 임대료를 냅니다. 전세임대는 공사가 낸 전세보증금 중 일부를 내가 부담하고, 나머지 지원금에 대한 이자 성격의 월 임대료를 냅니다. 금액과 한도는 공고마다 달라 공고문의 임대조건을 꼭 확인하세요.</item>
+        <item>빨리 입주하고 싶고 정해진 집이 괜찮다면 매입임대, 동네와 집을 직접 고르고 싶고 발품을 팔 수 있다면 전세임대가 맞습니다. 두 공고에 함께 지원할 수 있는지는 공고마다 다릅니다.</item>
+    </string-array>
+
+    <string name="guide_visit_checklist_title">임장 갈 때\n꼭 봐야 할 7가지</string>
+    <string name="guide_visit_checklist_lead">사진과 지도로는 안 보이는 것만 현장에서 확인합니다. 낮과 저녁, 두 번 가면 더 정확합니다. 본 것은 임장노트에 바로 남기세요.</string>
+    <string-array name="guide_visit_checklist_point_titles">
+        <item>채광과 향</item>
+        <item>소음</item>
+        <item>누수·곰팡이</item>
+        <item>수압과 배수</item>
+        <item>역까지 실제 도보</item>
+        <item>주차와 엘리베이터</item>
+        <item>관리 상태</item>
+    </string-array>
+    <string-array name="guide_visit_checklist_point_bodies">
+        <item>낮에 불을 끄고 방마다 들어가 봅니다. 앞 건물이 해를 가리는지, 오후에도 밝은지 봅니다.</item>
+        <item>창문을 닫고 도로·철로 소리를, 열고 윗집·옆집 생활 소음을 들어 봅니다. 저녁 방문이 정확합니다.</item>
+        <item>천장 모서리, 창틀 아래, 싱크대 안쪽, 베란다 벽을 봅니다. 새로 칠한 자국이 있으면 왜 칠했는지 물어보세요.</item>
+        <item>샤워기와 세면대를 동시에 틀어 보고, 변기 물을 내려 봅니다.</item>
+        <item>지도의 도보 시간은 직선 기준일 때가 많습니다. 실제로 걸어 보고 언덕·횡단보도·골목 조명을 함께 봅니다.</item>
+        <item>차가 있다면 저녁에 주차 공간이 남는지, 엘리베이터가 출근 시간에 얼마나 기다리는지 봅니다.</item>
+        <item>복도·계단·분리수거장이 깨끗한지, 관리사무소 응대가 어떤지. 단지가 어떻게 관리되는지는 여기서 드러납니다.</item>
+    </string-array>
+
+    <string name="guide_documents_title">미리 떼어두면\n좋은 서류 4가지</string>
+    <string name="guide_documents_lead">공고가 뜨고 접수까지는 보통 1~2주입니다. 발급에 시간이 걸리는 서류는 미리 준비해 두면 마감 직전에 허둥대지 않습니다.</string>
+    <string-array name="guide_documents_point_titles">
+        <item>주민등록등본·초본</item>
+        <item>가족관계증명서</item>
+        <item>건강보험 자격득실 확인서</item>
+        <item>소득금액증명</item>
+    </string-array>
+    <string-array name="guide_documents_point_bodies">
+        <item>거주 요건과 무주택 기간 확인에 씁니다. 정부24에서 바로 발급됩니다.</item>
+        <item>세대 구성과 부양가족 확인용입니다. 상세 증명서를 요구하는 공고가 있으니 공고문을 확인하세요.</item>
+        <item>소득과 재직 확인의 기본 서류입니다. 국민건강보험공단 홈페이지·앱에서 발급됩니다.</item>
+        <item>홈택스에서 발급하며 직전 연도 신고가 끝나야 나옵니다. 가장 발급이 늦어지기 쉬운 서류라 먼저 챙기세요.</item>
+    </string-array>
+
     <string name="home_footnote">공고 내용은 원문이 우선합니다. 앱 표기와 다를 경우 각 기관 공고문을 확인해 주세요.</string>
 
     <!-- 공고 목록 -->

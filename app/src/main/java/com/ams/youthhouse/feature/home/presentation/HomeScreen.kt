@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +27,7 @@ import com.ams.youthhouse.core.designsystem.component.FootnoteText
 import com.ams.youthhouse.core.designsystem.component.SectionHeader
 import com.ams.youthhouse.core.designsystem.component.SettingsRow
 import com.ams.youthhouse.core.designsystem.component.SettingsRowGroup
+import com.ams.youthhouse.core.designsystem.theme.AppRadius
 import com.ams.youthhouse.core.designsystem.theme.AppSpacing
 import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.core.notice.presentation.component.NoticeItemCard
@@ -31,11 +35,17 @@ import com.ams.youthhouse.core.notice.presentation.component.NoticeRegionSpinner
 import com.ams.youthhouse.core.notice.presentation.model.NoticeStatus
 import com.ams.youthhouse.core.notice.presentation.model.NoticeUiModel
 import com.ams.youthhouse.core.notice.presentation.model.previewNoticeUiModel
+import com.ams.youthhouse.feature.home.presentation.component.GuideRail
 import com.ams.youthhouse.feature.home.presentation.component.NoOpenNoticeGuide
+import com.ams.youthhouse.feature.home.presentation.component.PlannedVisitCard
 import com.ams.youthhouse.feature.home.presentation.component.RegionStatusBar
 import com.ams.youthhouse.feature.home.presentation.component.RegionUnsetBanner
 import com.ams.youthhouse.feature.home.presentation.component.UrgentDeadlineCard
+import com.ams.youthhouse.feature.home.presentation.component.VisitEmptyBlock
+import com.ams.youthhouse.feature.home.presentation.component.VisitRowGroup
+import com.ams.youthhouse.feature.home.presentation.guide.HomeGuide
 import com.ams.youthhouse.feature.home.presentation.model.HomeSummaryUiModel
+import com.ams.youthhouse.feature.home.presentation.model.HomeVisitUiModel
 import com.ams.youthhouse.feature.home.presentation.model.UrgentNoticeUiModel
 
 @Composable
@@ -80,17 +90,90 @@ private fun LazyListScope.homeContent(
 ) {
     val summary = uiState.summary ?: return
 
-    // 기획서 H-01은 홈을 2블록(공고 알림 / 임장기록)으로 잡았지만, 임장노트 기능이 없어
-    // 두 번째 블록은 비워 둔 채 "매물 등록" 버튼만 놓여 있었다. 그 버튼은 준비 중 화면으로
-    // 이어지는 막다른 길이라 블록째로 걷어냈다. 기능이 생기면 되살린다.
+    // 기획서 H-01: 공고 알림 블록 → 임장기록 블록 → 부가(콘텐츠·현황). 순서를 바꾸지 않는다.
     noticeBlock(uiState = uiState, summary = summary, onAction = onAction)
 
-    // 아래 두 블록은 지역 필터와 무관하다 — 찜과 관심 단지는 사용자가 직접 고른 것이라
+    // 아래 블록들은 지역 필터와 무관하다 — 찜·관심 단지·임장노트는 사용자가 직접 쌓은 것이라
     // 지역을 바꿨다고 사라지면 안 된다. 그래서 noticeBlock 바깥에 둔다.
     scheduleSection(uiState = uiState, onAction = onAction)
     favoriteComplexSection(uiState = uiState, onAction = onAction)
+    visitBlock(uiState = uiState, onAction = onAction)
+    guideSection(onAction = onAction)
 
     item { FootnoteText(text = stringResource(R.string.home_footnote)) }
+}
+
+/**
+ * 임장기록 블록 — 내가 쌓아가는 것들. 공고 블록과 성격이 반대라 [BlockLabel]로 경계를 긋는다.
+ *
+ * 기획서 H-06: 예정은 카드, 다녀온 곳은 행. 둘 이상이면 비교 진입점을 단다.
+ * 기록이 없으면 빈 카드로 두 번째 쓸모를 알린다(SCREEN 02) — 공고가 0건인 달에도
+ * 홈에 남는 내 데이터가 이 블록이다.
+ */
+private fun LazyListScope.visitBlock(
+    uiState: HomeContract.State,
+    onAction: (HomeContract.Action) -> Unit,
+) {
+    // 로드 전에는 빈 카드가 깜빡였다 사라진다. 도착할 때까지 블록째 기다린다.
+    if (!uiState.isVisitsLoaded) return
+
+    item { BlockLabel(text = stringResource(R.string.home_block_visit)) }
+
+    if (uiState.visits.isEmpty()) {
+        item {
+            VisitEmptyBlock(
+                onFindComplexClick = { onAction(HomeContract.Action.SeeAllComplexesClicked) },
+            )
+        }
+        return
+    }
+
+    item {
+        SectionHeader(
+            title = stringResource(R.string.home_section_visits),
+            trailingText = stringResource(R.string.home_section_visits_more, uiState.visitCount),
+            onTrailingClick = { onAction(HomeContract.Action.SeeAllComplexesClicked) },
+        )
+    }
+
+    val (planned, done) = uiState.visits.partition { it.isPlanned }
+    items(planned, key = { "planned-${it.kaptCode}" }) { visit ->
+        PlannedVisitCard(
+            visit = visit,
+            onClick = { onAction(HomeContract.Action.VisitClicked(visit)) },
+        )
+    }
+    if (done.isNotEmpty()) {
+        item {
+            VisitRowGroup(
+                visits = done,
+                onVisitClick = { visit -> onAction(HomeContract.Action.VisitClicked(visit)) },
+            )
+        }
+    }
+
+    if (uiState.canCompareVisits) {
+        item {
+            OutlinedButton(
+                onClick = { onAction(HomeContract.Action.CompareVisitsClicked) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(AppRadius.button),
+            ) {
+                Text(text = stringResource(R.string.home_visit_compare, uiState.visitCount))
+            }
+        }
+    }
+}
+
+/** 기획서 "알아두면 좋은 것" — 앱에 묶인 가이드 글. 두 블록이 다 끝난 뒤에만 놓는다(AD-02와 같은 자리). */
+private fun LazyListScope.guideSection(onAction: (HomeContract.Action) -> Unit) {
+    item { SectionHeader(title = stringResource(R.string.home_section_guides)) }
+    item {
+        GuideRail(
+            guides = HomeGuide.entries,
+            onGuideClick = { guide -> onAction(HomeContract.Action.GuideClicked(guide)) },
+        )
+    }
 }
 
 /**
@@ -124,13 +207,35 @@ private fun LazyListScope.noticeBlock(
             )
         }
 
-        HomeMode.NO_OPEN_NOTICE -> item {
-            NoOpenNoticeGuide(
-                regionName = uiState.selectedRegion?.regionName.orEmpty(),
-                nextOpenDate = summary.nextOpenDate,
-                onChangeRegionClick = { onAction(HomeContract.Action.RegionSelected(null)) },
-                onSeeAllClick = { onAction(HomeContract.Action.SeeAllNoticesClicked) },
-            )
+        HomeMode.NO_OPEN_NOTICE -> {
+            item {
+                NoOpenNoticeGuide(
+                    regionName = uiState.selectedRegion?.regionName.orEmpty(),
+                    nextOpenDate = summary.nextOpenDate,
+                    onChangeRegionClick = { onAction(HomeContract.Action.RegionSelected(null)) },
+                    onSeeAllClick = { onAction(HomeContract.Action.SeeAllNoticesClicked) },
+                )
+            }
+            // 기획서 SCREEN 03 "곧 열릴 공고" — 접수중이 없어도 기다릴 게 있음을 보인다.
+            if (summary.upcomingNotices.isNotEmpty()) {
+                item {
+                    SectionHeader(
+                        title = stringResource(R.string.home_section_upcoming_notice),
+                        trailingText = stringResource(
+                            R.string.home_section_upcoming_more,
+                            summary.upcomingCount,
+                        ),
+                        onTrailingClick = { onAction(HomeContract.Action.SeeAllNoticesClicked) },
+                    )
+                }
+                items(summary.upcomingNotices.size) { index ->
+                    val notice = summary.upcomingNotices[index]
+                    NoticeItemCard(
+                        notice = notice,
+                        onClick = { onAction(HomeContract.Action.NoticeClicked(notice)) },
+                    )
+                }
+            }
         }
 
         HomeMode.DEFAULT -> {
@@ -343,6 +448,34 @@ private fun previewState() = HomeContract.State(
     isRegionLoaded = true,
     selectedRegion = com.ams.youthhouse.core.notice.domain.model.NoticeRegion.SEOUL,
     summary = previewSummary(),
+    isVisitsLoaded = true,
+    visitCount = 3,
+    visits = listOf(
+        HomeVisitUiModel(
+            kaptCode = "A1",
+            complexName = "관악푸르지오아파트",
+            regionLabel = "서울특별시 관악구 봉천동",
+            visitedOnLabel = "09.12",
+            isPlanned = true,
+            isIncomplete = false,
+            stars = null,
+            ratedCount = 0,
+            totalCriteria = 4,
+            viewedUnit = "84㎡ · 12층 · 남향",
+        ),
+        HomeVisitUiModel(
+            kaptCode = "A2",
+            complexName = "봉천두산",
+            regionLabel = "서울특별시 관악구 봉천동",
+            visitedOnLabel = "07.27",
+            isPlanned = false,
+            isIncomplete = false,
+            stars = 4,
+            ratedCount = 4,
+            totalCriteria = 4,
+            viewedUnit = "",
+        ),
+    ),
 )
 
 private fun previewSummary() = HomeSummaryUiModel(

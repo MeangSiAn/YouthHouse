@@ -5,12 +5,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.ams.youthhouse.feature.home.presentation.navigation.HomeDestination
+import com.ams.youthhouse.feature.home.presentation.navigation.guideScreen
 import com.ams.youthhouse.feature.home.presentation.navigation.homeScreen
+import com.ams.youthhouse.feature.home.presentation.navigation.navigateToGuide
 import com.ams.youthhouse.feature.notice.presentation.navigation.navigateToNoticeDetail
 import com.ams.youthhouse.feature.notice.presentation.navigation.noticeDetailScreen
 import com.ams.youthhouse.feature.notice.presentation.navigation.noticeScreen
 import com.ams.youthhouse.feature.schedule.presentation.navigation.scheduleScreen
 import com.ams.youthhouse.feature.settings.presentation.navigation.settingsScreen
+import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
 import com.ams.youthhouse.feature.trade.presentation.navigation.complexDetailScreen
 import com.ams.youthhouse.feature.trade.presentation.navigation.navigateToComplexDetail
 import com.ams.youthhouse.feature.trade.presentation.navigation.navigateToSiteVisitNote
@@ -35,7 +38,15 @@ fun MainNavHost(
             onSeeAllScheduleClick = { navController.navigateToTab(MainTab.SCHEDULE) },
             onComplexClick = navController::navigateToComplexDetail,
             onSeeAllComplexesClick = { navController.navigateToTab(MainTab.TRADE) },
+            onVisitNoteClick = { kaptCode, name ->
+                navController.navigateToSiteVisitNote(
+                    SiteVisitNoteDestination(kaptCode = kaptCode, name = name),
+                )
+            },
+            onCompareVisitsClick = navController::navigateToVisitCompare,
+            onGuideClick = navController::navigateToGuide,
         )
+        guideScreen(onBackClick = { navController.popBackStack() })
         noticeScreen(onNoticeClick = navController::navigateToNoticeDetail)
         noticeDetailScreen(onBackClick = { navController.popBackStack() })
         scheduleScreen(
