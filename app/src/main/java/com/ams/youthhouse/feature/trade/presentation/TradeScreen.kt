@@ -16,10 +16,12 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -82,6 +84,17 @@ fun TradeScreen(
                 placeholder = { Text(text = stringResource(R.string.trade_search_hint)) },
                 leadingIcon = {
                     Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+                },
+                trailingIcon = {
+                    // 한 글자씩 지우게 두지 않는다 — 다른 단지를 찾을 땐 통째로 비우는 게 보통이다.
+                    if (uiState.query.isNotEmpty()) {
+                        IconButton(onClick = { onAction(TradeContract.Action.QueryChanged("")) }) {
+                            Icon(
+                                imageVector = Icons.Filled.Clear,
+                                contentDescription = stringResource(R.string.trade_search_clear),
+                            )
+                        }
+                    }
                 },
                 singleLine = true,
                 shape = RoundedCornerShape(AppRadius.card),
