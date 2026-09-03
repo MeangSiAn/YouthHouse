@@ -1,4 +1,4 @@
-package com.ams.youthhouse.feature.trade.presentation.detail
+package com.ams.youthhouse.feature.trade.presentation.compare
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -9,21 +9,21 @@ import com.ams.youthhouse.core.ui.extension.CollectUiEffect
 import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
 
 @Composable
-fun ComplexDetailRoute(
+fun VisitCompareRoute(
     onBackClick: () -> Unit,
     onNoteClick: (SiteVisitNoteDestination) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ComplexDetailViewModel = hiltViewModel(),
+    viewModel: VisitCompareViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     CollectUiEffect(viewModel.uiEffect) { effect ->
         when (effect) {
-            is ComplexDetailContract.Effect.NavigateToNote -> onNoteClick(effect.destination)
+            is VisitCompareContract.Effect.NavigateToNote -> onNoteClick(effect.destination)
         }
     }
 
-    ComplexDetailScreen(
+    VisitCompareScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         onBackClick = onBackClick,

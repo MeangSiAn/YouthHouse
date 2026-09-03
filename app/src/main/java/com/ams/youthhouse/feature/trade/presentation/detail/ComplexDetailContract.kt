@@ -1,10 +1,12 @@
 package com.ams.youthhouse.feature.trade.presentation.detail
 
 import androidx.annotation.StringRes
-import com.ams.youthhouse.feature.trade.domain.model.ComplexDetail
 import com.ams.youthhouse.core.presentation.contract.UiAction
 import com.ams.youthhouse.core.presentation.contract.UiEffect
 import com.ams.youthhouse.core.presentation.contract.UiState
+import com.ams.youthhouse.feature.trade.domain.model.ComplexDetail
+import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
+import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
 
 object ComplexDetailContract {
 
@@ -22,13 +24,18 @@ object ComplexDetailContract {
         /** 선택된 전용면적. `null`이면 아직 데이터가 없다. */
         val selectedArea: Double? = null,
         val isFavorite: Boolean = false,
+        /** 이 단지에 남긴 임장노트. 없으면 `null`. */
+        val note: SiteVisitNote? = null,
     ) : UiState
 
     sealed interface Action : UiAction {
         data class AreaSelected(val area: Double) : Action
         data object FavoriteClicked : Action
+        data object NoteClicked : Action
         data object RetryClicked : Action
     }
 
-    sealed interface Effect : UiEffect
+    sealed interface Effect : UiEffect {
+        data class NavigateToNote(val destination: SiteVisitNoteDestination) : Effect
+    }
 }

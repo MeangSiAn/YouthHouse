@@ -5,6 +5,8 @@ import com.ams.youthhouse.core.presentation.base.BaseViewModel
 import com.ams.youthhouse.core.ui.error.toUserMessageRes
 import com.ams.youthhouse.feature.trade.domain.repository.ComplexRepository
 import com.ams.youthhouse.feature.trade.domain.repository.FavoriteComplexRepository
+import com.ams.youthhouse.feature.trade.domain.repository.SiteVisitNoteRepository
+import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,6 +24,7 @@ import javax.inject.Inject
 class TradeViewModel @Inject constructor(
     private val complexRepository: ComplexRepository,
     favoriteComplexRepository: FavoriteComplexRepository,
+    siteVisitNoteRepository: SiteVisitNoteRepository,
 ) : BaseViewModel<
     TradeContract.State,
     TradeContract.Action,
@@ -39,6 +42,10 @@ class TradeViewModel @Inject constructor(
             .onEach { favorites ->
                 updateState { copy(favorites = favorites, isFavoritesLoaded = true) }
             }
+            .launchIn(viewModelScope)
+
+        siteVisitNoteRepository.notes
+            .onEach { notes -> updateState { copy(notes = notes) } }
             .launchIn(viewModelScope)
 
         queryInput
@@ -89,6 +96,18 @@ class TradeViewModel @Inject constructor(
 
             is TradeContract.Action.ComplexClicked -> {
                 sendEffect(TradeContract.Effect.NavigateToDetail(action.kaptCode, action.name))
+            }
+
+            is TradeContract.Action.NoteClicked -> {
+                sendEffect(
+                    TradeContract.Effect.NavigateToNote(
+                        SiteVisitNoteDestination(kaptCode = action.kaptCode, name = action.name),
+                    ),
+                )
+            }
+
+            TradeContract.Action.CompareClicked -> {
+                sendEffect(TradeContract.Effect.NavigateToCompare)
             }
         }
     }

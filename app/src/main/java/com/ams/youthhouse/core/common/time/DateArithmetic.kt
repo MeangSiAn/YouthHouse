@@ -16,12 +16,30 @@ import java.util.TimeZone
  * @return 형식이 `YYYYMMDD` 8자리 숫자가 아니면 `null`
  */
 fun daysBetween(from: String?, to: String?): Int? {
-    val fromMillis = from.toUtcMidnightMillis() ?: return null
-    val toMillis = to.toUtcMidnightMillis() ?: return null
+    val fromMillis = from.yyyyMmDdToUtcMidnightMillis() ?: return null
+    val toMillis = to.yyyyMmDdToUtcMidnightMillis() ?: return null
     return ((toMillis - fromMillis) / MILLIS_PER_DAY).toInt()
 }
 
-private fun String?.toUtcMidnightMillis(): Long? {
+/** UTC 자정 epoch millis → `YYYYMMDD`. Material DatePicker가 이 단위로 날짜를 준다. */
+fun Long.utcMidnightMillisToYyyyMmDd(): String {
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.US).apply {
+        timeInMillis = this@utcMidnightMillisToYyyyMmDd
+    }
+    return "%04d%02d%02d".format(
+        Locale.US,
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH) + 1,
+        calendar.get(Calendar.DAY_OF_MONTH),
+    )
+}
+
+/**
+ * `YYYYMMDD` → UTC 자정 epoch millis. [utcMidnightMillisToYyyyMmDd]의 역함수.
+ *
+ * @return 형식이 `YYYYMMDD` 8자리 숫자가 아니면 `null`
+ */
+fun String?.yyyyMmDdToUtcMidnightMillis(): Long? {
     val raw = this ?: return null
     if (raw.length != 8 || !raw.all(Char::isDigit)) return null
 

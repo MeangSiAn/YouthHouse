@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -41,6 +43,7 @@ import com.ams.youthhouse.core.designsystem.component.FootnoteText
 import com.ams.youthhouse.core.designsystem.component.SectionHeader
 import com.ams.youthhouse.core.designsystem.component.SummaryEntry
 import com.ams.youthhouse.core.designsystem.component.SummaryGrid
+import com.ams.youthhouse.core.designsystem.theme.AppRadius
 import com.ams.youthhouse.core.designsystem.theme.AppSize
 import com.ams.youthhouse.core.designsystem.theme.AppSpacing
 import com.ams.youthhouse.core.designsystem.theme.AppTextStyles
@@ -51,12 +54,15 @@ import com.ams.youthhouse.feature.trade.domain.model.AreaTrend
 import com.ams.youthhouse.feature.trade.domain.model.BuildingInfo
 import com.ams.youthhouse.feature.trade.domain.model.ComplexDeal
 import com.ams.youthhouse.feature.trade.domain.model.ComplexDetail
+import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
 import com.ams.youthhouse.feature.trade.domain.model.Surroundings
 import com.ams.youthhouse.feature.trade.domain.model.TransitInfo
 import com.ams.youthhouse.feature.trade.domain.model.TrendPoint
 import com.ams.youthhouse.feature.trade.presentation.component.DealTrendChart
 import com.ams.youthhouse.feature.trade.presentation.component.FacilityChip
 import com.ams.youthhouse.feature.trade.presentation.component.InfoRow
+import com.ams.youthhouse.feature.trade.presentation.component.SiteVisitNoteCard
+import com.ams.youthhouse.feature.trade.presentation.component.formatArea
 
 /**
  * 기획서 dev2.0 SCREEN 08 — 단지 상세.
@@ -113,6 +119,15 @@ fun ComplexDetailScreen(
                 },
             )
         },
+        bottomBar = {
+            // 기획서의 고정 버튼. 긴 상세를 다 내리지 않아도 현장에서 바로 쓸 수 있어야 한다.
+            if (uiState.detail != null) {
+                NoteActionBar(
+                    hasNote = uiState.note != null,
+                    onClick = { onAction(ComplexDetailContract.Action.NoteClicked) },
+                )
+            }
+        },
     ) { innerPadding ->
         when {
             uiState.isLoading -> CenterBox(Modifier.padding(innerPadding)) {
@@ -130,8 +145,27 @@ fun ComplexDetailScreen(
             uiState.detail != null -> DetailContent(
                 detail = uiState.detail,
                 selectedArea = uiState.selectedArea,
+                note = uiState.note,
                 onAction = onAction,
                 modifier = Modifier.padding(innerPadding),
+            )
+        }
+    }
+}
+
+@Composable
+private fun NoteActionBar(hasNote: Boolean, onClick: () -> Unit) {
+    Column {
+        HorizontalDivider(thickness = AppSize.border, color = AppTheme.semanticColors.line)
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.md),
+            shape = RoundedCornerShape(AppRadius.button),
+        ) {
+            Text(
+                text = stringResource(if (hasNote) R.string.note_edit else R.string.note_write),
             )
         }
     }
@@ -163,6 +197,7 @@ private fun CenterBox(modifier: Modifier = Modifier, content: @Composable () -> 
 private fun DetailContent(
     detail: ComplexDetail,
     selectedArea: Double?,
+    note: SiteVisitNote?,
     onAction: (ComplexDetailContract.Action) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -190,7 +225,31 @@ private fun DetailContent(
             SurroundingSection(detail.surroundings)
         }
 
+        NoteSection(note = note, onAction = onAction)
+
         FootnoteText(text = stringResource(R.string.trade_footnote))
+    }
+}
+
+// ── 임장노트 ─────────────────────────────────────────────
+
+@Composable
+private fun NoteSection(note: SiteVisitNote?, onAction: (ComplexDetailContract.Action) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
+        SectionHeader(title = stringResource(R.string.note_section_mine))
+        if (note == null) {
+            Text(
+                text = stringResource(R.string.note_empty_detail),
+                style = MaterialTheme.typography.bodySmall,
+                color = AppTheme.semanticColors.ink45,
+            )
+        } else {
+            SiteVisitNoteCard(
+                note = note,
+                onClick = { onAction(ComplexDetailContract.Action.NoteClicked) },
+                showComplexName = false,
+            )
+        }
     }
 }
 
@@ -518,12 +577,6 @@ private fun ComplexDetail.toSummaryEntries(): List<SummaryEntry> = listOfNotNull
         SummaryEntry(label = stringResource(R.string.complex_heating), value = it)
     },
 )
-
-/** `59.58` → `59.58㎡`, `85.0` → `85㎡` */
-private fun Double.formatArea(): String {
-    val text = if (this % 1.0 == 0.0) toInt().toString() else toString()
-    return "$text㎡"
-}
 
 private const val MAX_DEAL_ROWS = 5
 private const val MIN_TREND_POINTS = 3

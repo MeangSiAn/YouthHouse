@@ -43,10 +43,11 @@ interface FavoriteComplexDao {
  * 두 슬라이스가 서로의 스키마 버전에 발목 잡히지 않게.
  */
 @Database(
-    entities = [FavoriteComplexEntity::class],
-    version = 1,
+    entities = [FavoriteComplexEntity::class, SiteVisitNoteEntity::class],
+    version = 2,
     exportSchema = false,
 )
 abstract class TradeDatabase : RoomDatabase() {
     abstract fun favoriteComplexDao(): FavoriteComplexDao
+    abstract fun siteVisitNoteDao(): SiteVisitNoteDao
 }

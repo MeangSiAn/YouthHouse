@@ -5,10 +5,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ams.youthhouse.core.presentation.base.BaseViewModel
 import com.ams.youthhouse.core.ui.error.toUserMessageRes
+import com.ams.youthhouse.feature.trade.domain.model.ComplexDetail
 import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
 import com.ams.youthhouse.feature.trade.domain.repository.ComplexRepository
 import com.ams.youthhouse.feature.trade.domain.repository.FavoriteComplexRepository
+import com.ams.youthhouse.feature.trade.domain.repository.SiteVisitNoteRepository
 import com.ams.youthhouse.feature.trade.presentation.navigation.ComplexDetailDestination
+import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.launchIn
@@ -21,6 +24,7 @@ class ComplexDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val complexRepository: ComplexRepository,
     private val favoriteComplexRepository: FavoriteComplexRepository,
+    siteVisitNoteRepository: SiteVisitNoteRepository,
 ) : BaseViewModel<
     ComplexDetailContract.State,
     ComplexDetailContract.Action,
@@ -39,6 +43,10 @@ class ComplexDetailViewModel @Inject constructor(
 
         favoriteComplexRepository.favoriteCodes
             .onEach { codes -> updateState { copy(isFavorite = currentState.kaptCode in codes) } }
+            .launchIn(viewModelScope)
+
+        siteVisitNoteRepository.observe(currentState.kaptCode)
+            .onEach { note -> updateState { copy(note = note) } }
             .launchIn(viewModelScope)
     }
 
@@ -88,6 +96,15 @@ class ComplexDetailViewModel @Inject constructor(
                 }
             }
 
+            ComplexDetailContract.Action.NoteClicked -> {
+                val detail = currentState.detail ?: return
+                sendEffect(
+                    ComplexDetailContract.Effect.NavigateToNote(
+                        detail.toNoteDestination(currentState.selectedArea),
+                    ),
+                )
+            }
+
             ComplexDetailContract.Action.RetryClicked -> load()
         }
     }
@@ -97,3 +114,19 @@ class ComplexDetailViewModel @Inject constructor(
         const val TREND_MONTHS = 12
     }
 }
+
+/** 노트 편집기에 실어 보낼 단지 요약. 보고 있던 평형의 최근 실거래가 "방문 당시 시세"로 남는다. */
+private fun ComplexDetail.toNoteDestination(selectedArea: Double?) = SiteVisitNoteDestination(
+    kaptCode = kaptCode,
+    name = name,
+    regionLabel = address.orEmpty(),
+    builtYear = useApprovalDate?.take(YEAR_LENGTH),
+    householdCount = householdCount,
+    subwayLabel = listOfNotNull(transit.subwayLine, transit.subwayStation, transit.subwayWalkTime)
+        .joinToString(separator = " · ")
+        .ifBlank { null },
+    referenceArea = selectedArea?.toString(),
+    referenceAmount = selectedArea?.let { trendsByArea[it]?.latestAmount },
+)
+
+private const val YEAR_LENGTH = 4

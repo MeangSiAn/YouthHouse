@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -20,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,7 +41,13 @@ import com.ams.youthhouse.core.designsystem.theme.AppSpacing
 import com.ams.youthhouse.core.designsystem.theme.AppTextStyles
 import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.feature.trade.domain.model.AptComplex
+import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
+import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
 import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
+import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
+import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
+import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
+import com.ams.youthhouse.feature.trade.presentation.component.SiteVisitNoteCard
 
 /**
  * 기획서 dev2.0 SCREEN 04 — 매매.
@@ -84,9 +92,67 @@ fun TradeScreen(
             searchResults(uiState, onAction)
         } else {
             favoriteComplexes(uiState, onAction)
+            siteVisitNotes(uiState, onAction)
         }
 
         item { FootnoteText(text = stringResource(R.string.trade_footnote)) }
+    }
+}
+
+/**
+ * 기획서 SCREEN 04 하단 "내 임장노트". 노트는 단지 상세에서만 쓸 수 있어 여기엔
+ * 쓰기 버튼이 없고, 대신 둘 이상 모이면 비교 진입점이 생긴다.
+ */
+private fun LazyListScope.siteVisitNotes(
+    uiState: TradeContract.State,
+    onAction: (TradeContract.Action) -> Unit,
+) {
+    item {
+        SectionHeader(
+            title = stringResource(R.string.note_section_mine),
+            trailingText = pluralStringResource(
+                R.plurals.trade_result_count,
+                uiState.notes.size,
+                uiState.notes.size,
+            ).takeIf { uiState.notes.isNotEmpty() },
+        )
+    }
+
+    if (uiState.notes.isEmpty()) {
+        item {
+            Text(
+                text = stringResource(R.string.note_list_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = AppTheme.semanticColors.ink45,
+            )
+        }
+        return
+    }
+
+    items(uiState.notes, key = { it.kaptCode }) { note ->
+        SiteVisitNoteCard(
+            note = note,
+            onClick = {
+                onAction(
+                    TradeContract.Action.NoteClicked(
+                        kaptCode = note.kaptCode,
+                        name = note.complexName,
+                    ),
+                )
+            },
+        )
+    }
+
+    if (uiState.canCompareNotes) {
+        item {
+            OutlinedButton(
+                onClick = { onAction(TradeContract.Action.CompareClicked) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(AppRadius.button),
+            ) {
+                Text(text = stringResource(R.string.note_compare))
+            }
+        }
     }
 }
 
@@ -256,6 +322,21 @@ private fun TradeScreenFavoritesPreview() {
                 favorites = listOf(
                     FavoriteComplex("A15105302", "관악푸르지오", "서울특별시 관악구 봉천동"),
                     FavoriteComplex("A68134004", "다운동아", "울산광역시 중구 다운동"),
+                ),
+                notes = listOf(
+                    SiteVisitNote(
+                        kaptCode = "A15105302",
+                        complexName = "관악푸르지오",
+                        regionLabel = "서울특별시 관악구 봉천동",
+                        visitedOn = "20260720",
+                        viewedUnit = "84㎡ · 12층",
+                        ratings = VisitRatings(mapOf(VisitCriterion.LIGHT to 4)),
+                        walkToStationMinutes = 8,
+                        defectStatus = DefectStatus.NONE,
+                        memo = "남향 채광 좋음.",
+                        snapshot = ComplexSnapshot.EMPTY,
+                        updatedAtMillis = 0L,
+                    ),
                 ),
             ),
             onAction = {},

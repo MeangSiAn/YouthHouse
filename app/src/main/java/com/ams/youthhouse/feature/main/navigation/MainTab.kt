@@ -26,9 +26,7 @@ import com.ams.youthhouse.feature.settings.presentation.navigation.SettingsDesti
  * 각 탭은 다른 feature의 **navigation contract(Destination)** 만 참조한다.
  * Activity/ViewModel 등 구현체는 참조하지 않는다.
  *
- * 임장노트는 화면이 자리만 잡힌 상태라 탭에서 빼 두었다. 동작하지 않는 탭을 노출하면
- * 스토어 심사에서 미완성 기능으로 잡히고, 무엇보다 눌러서 빈 화면에 도착한다.
- * 기능이 생기면 `NoteDestination`으로 항목을 되살리면 된다.
+ * 임장노트는 탭이 아니다 — dev2.0 기획대로 단지에 종속돼 매매 탭 안(단지 상세)에서 쓴다.
  */
 enum class MainTab(
     val destination: Any,

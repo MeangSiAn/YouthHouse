@@ -12,8 +12,52 @@
     <string name="main_tab_trade">매매</string>
     <string name="main_tab_my">마이</string>
 
-    <!-- 임장노트: 기능 미구현이라 탭에서 빠져 있다. 화면 자체는 남겨 둔다. -->
-    <string name="note_placeholder">임장노트 준비 중</string>
+    <!-- 임장노트 -->
+    <string name="note_title">임장노트</string>
+    <string name="note_section_mine">내 임장노트</string>
+    <string name="note_write">임장노트 쓰기</string>
+    <string name="note_edit">임장노트 수정</string>
+    <string name="note_compare">임장 단지 비교하기</string>
+    <string name="note_list_hint">단지 상세 화면의 ‘임장노트 쓰기’로 현장에서 본 것을 남겨 두세요.</string>
+    <string name="note_empty_detail">아직 이 단지에 남긴 임장노트가 없습니다.</string>
+    <string name="note_visited_on">방문일</string>
+    <string name="note_viewed_unit">본 매물</string>
+    <string name="note_viewed_unit_hint">84㎡ · 12층 · 남향</string>
+    <string name="note_section_checks">현장 점검</string>
+    <string name="note_scale">5점 척도</string>
+    <string name="note_criterion_light">채광</string>
+    <string name="note_criterion_noise">소음</string>
+    <string name="note_criterion_parking">주차</string>
+    <string name="note_criterion_management">단지 관리</string>
+    <string name="note_score_short">%1$s %2$d</string>
+    <string name="note_overall">종합</string>
+    <string name="note_walk_to_station">역까지 도보</string>
+    <string name="note_walk_unit">분</string>
+    <string name="note_walk_minutes">%1$d분</string>
+    <string name="note_walk_short">역 도보 %1$d분</string>
+    <string name="note_defect">누수·곰팡이</string>
+    <string name="note_defect_unchecked">미확인</string>
+    <string name="note_defect_none">없음</string>
+    <string name="note_defect_found">있음</string>
+    <string name="note_section_memo">메모</string>
+    <string name="note_memo_free">자유 기록</string>
+    <string name="note_memo_hint">현장에서 느낀 것 한 줄이면 충분합니다.</string>
+    <string name="note_reference_deal">방문 당시 실거래</string>
+    <string name="note_save">저장</string>
+    <string name="note_delete">삭제</string>
+    <string name="note_delete_confirm_title">임장노트를 삭제할까요?</string>
+    <string name="note_delete_confirm_body">이 단지에 남긴 점검 결과와 메모가 지워집니다.</string>
+    <string name="note_footnote">임장노트는 이 기기에만 저장되며 서버로 전송되지 않습니다.</string>
+
+    <!-- 임장 단지 비교 -->
+    <string name="compare_title">임장 단지 비교</string>
+    <string name="compare_pick">비교할 단지</string>
+    <string name="compare_pick_limit">최대 %1$d곳</string>
+    <string name="compare_pick_hint">%1$d곳 이상 고르면 나란히 보입니다.</string>
+    <string name="compare_empty_title">비교하려면 임장노트가 2건 이상 필요합니다</string>
+    <string name="compare_empty_description">단지 상세에서 임장노트를 쓰면\n여기서 나란히 볼 수 있습니다.</string>
+    <string name="compare_footnote">강조는 남긴 점수 기준입니다. 점수를 매기지 않은 항목은 비교에서 빠집니다.</string>
+    <string name="compare_not_rated">—</string>
 
     <!-- 내 일정 -->
     <string name="schedule_title">내 일정</string>
@@ -117,6 +161,8 @@
 
     <!-- 공통 -->
     <string name="retry">다시 시도</string>
+    <string name="confirm">확인</string>
+    <string name="cancel">취소</string>
     <string name="error_network">네트워크에 연결할 수 없습니다</string>
     <string name="error_service_key">공공데이터포털 인증키가 유효하지 않습니다</string>
     <string name="error_server">공고 정보를 불러오지 못했습니다</string>
