@@ -9,6 +9,7 @@
     <string name="main_tab_home">홈</string>
     <string name="main_tab_notice">공고</string>
     <string name="main_tab_schedule">내 일정</string>
+    <string name="main_tab_trade">매매</string>
     <string name="main_tab_my">마이</string>
 
     <!-- 임장노트: 기능 미구현이라 탭에서 빠져 있다. 화면 자체는 남겨 둔다. -->
@@ -26,6 +27,34 @@
     <string name="schedule_empty_description">공고 카드의 하트를 누르면 여기에 모이고,\n마감이 다가오면 맨 위로 올라옵니다.</string>
     <string name="schedule_empty_action">공고 보러 가기</string>
     <string name="schedule_footnote">찜은 이 기기에만 저장됩니다. 마감된 공고도 기록으로 남습니다.</string>
+
+    <!-- 매매 -->
+    <string name="trade_title">매매</string>
+    <string name="trade_search_hint">단지명 검색 (2자 이상)</string>
+    <string name="trade_section_results">검색 결과</string>
+    <string name="trade_section_favorites">관심 단지</string>
+    <plurals name="trade_result_count">
+        <item quantity="other">%d건</item>
+    </plurals>
+    <string name="trade_search_empty">일치하는 단지가 없습니다.\n300세대 미만 단지는 목록에 없을 수 있어요.</string>
+    <string name="trade_favorites_empty_title">아직 관심 단지가 없습니다</string>
+    <string name="trade_favorites_empty_description">단지를 검색해 상세 화면에서 하트를 누르면\n여기에 모입니다.</string>
+    <string name="trade_footnote">실거래가는 국토교통부, 단지 정보는 K-apt 자료를 가공한 것입니다. 신고 지연·정정으로 실제와 다를 수 있습니다.</string>
+    <string name="complex_built">준공</string>
+    <string name="complex_built_year">%1$s년</string>
+    <string name="complex_households">세대수</string>
+    <string name="complex_dongs">동수</string>
+    <string name="complex_dong_count">%1$s개동</string>
+    <string name="complex_heating">난방</string>
+    <string name="complex_section_trend">실거래 추이</string>
+    <string name="complex_trend_window">최근 12개월</string>
+    <string name="complex_latest_deal">최근 실거래</string>
+    <string name="complex_section_recent_deals">최근 거래</string>
+    <plurals name="complex_deal_count">
+        <item quantity="other">%d건</item>
+    </plurals>
+    <string name="complex_no_deals_title">최근 12개월 거래가 없습니다</string>
+    <string name="complex_floor">%1$d층</string>
 
     <!-- 마이(설정) -->
     <string name="my_privacy_title">🔒 개인정보를 수집하지 않습니다</string>

@@ -12,6 +12,9 @@ import com.ams.youthhouse.feature.notice.presentation.navigation.noticeDetailScr
 import com.ams.youthhouse.feature.notice.presentation.navigation.noticeScreen
 import com.ams.youthhouse.feature.schedule.presentation.navigation.scheduleScreen
 import com.ams.youthhouse.feature.settings.presentation.navigation.settingsScreen
+import com.ams.youthhouse.feature.trade.presentation.navigation.complexDetailScreen
+import com.ams.youthhouse.feature.trade.presentation.navigation.navigateToComplexDetail
+import com.ams.youthhouse.feature.trade.presentation.navigation.tradeScreen
 
 @Composable
 fun MainNavHost(
@@ -33,6 +36,8 @@ fun MainNavHost(
             onNoticeClick = navController::navigateToNoticeDetail,
             onBrowseNoticesClick = { navController.navigateToTab(MainTab.NOTICE) },
         )
+        tradeScreen(onComplexClick = navController::navigateToComplexDetail)
+        complexDetailScreen(onBackClick = { navController.popBackStack() })
         // 탭에서 빠져 지금은 도달 경로가 없다. 기능이 생기면 MainTab에 항목만 되살린다.
         noteScreen()
         settingsScreen()

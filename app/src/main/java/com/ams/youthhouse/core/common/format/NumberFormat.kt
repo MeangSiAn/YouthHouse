@@ -11,3 +11,26 @@ import java.util.Locale
 fun Int?.formatThousands(): String? = this?.let { value ->
     String.format(Locale.US, "%,d", value)
 }
+
+/**
+ * **만원 단위** 금액을 부동산 관용 표기로 바꾼다. 실거래가 API가 만원 단위 정수를 준다.
+ *
+ * - `121500` → `12억 1,500`
+ * - `120000` → `12억`
+ * - `8700` → `8,700만`
+ * - `0` → `0만`, 음수는 부호를 앞에 붙인다(증감 표기용)
+ */
+fun Long.formatManwonAsEokMan(): String {
+    val sign = if (this < 0) "-" else ""
+    val value = kotlin.math.abs(this)
+    val eok = value / MAN_PER_EOK
+    val man = value % MAN_PER_EOK
+
+    return when {
+        eok == 0L -> "$sign${String.format(Locale.US, "%,d", man)}만"
+        man == 0L -> "$sign${eok}억"
+        else -> "$sign${eok}억 ${String.format(Locale.US, "%,d", man)}"
+    }
+}
+
+private const val MAN_PER_EOK = 10_000L

@@ -1,0 +1,65 @@
+package com.ams.youthhouse.feature.trade.data.repository
+
+import com.ams.youthhouse.core.network.safeApiCall
+import com.ams.youthhouse.feature.trade.data.api.MosstisAptApi
+import com.ams.youthhouse.feature.trade.data.local.FavoriteComplexDao
+import com.ams.youthhouse.feature.trade.data.local.FavoriteComplexEntity
+import com.ams.youthhouse.feature.trade.data.mapper.toDomain
+import com.ams.youthhouse.feature.trade.domain.model.AptComplex
+import com.ams.youthhouse.feature.trade.domain.model.ComplexDetail
+import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
+import com.ams.youthhouse.feature.trade.domain.repository.ComplexRepository
+import com.ams.youthhouse.feature.trade.domain.repository.FavoriteComplexRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class ComplexRepositoryImpl @Inject constructor(
+    private val api: MosstisAptApi,
+) : ComplexRepository {
+
+    override suspend fun search(query: String): List<AptComplex> = safeApiCall {
+        api.searchComplexes(query = query, limit = SEARCH_LIMIT).results
+            .filter { it.kaptCode.isNotBlank() }
+            .map { it.toDomain() }
+    }
+
+    override suspend fun getDetail(kaptCode: String, months: Int): ComplexDetail = safeApiCall {
+        api.getComplexDetail(kaptCode = kaptCode, months = months).toDomain()
+    }
+
+    private companion object {
+        const val SEARCH_LIMIT = 20
+    }
+}
+
+@Singleton
+class FavoriteComplexRepositoryImpl @Inject constructor(
+    private val dao: FavoriteComplexDao,
+) : FavoriteComplexRepository {
+
+    override val favorites: Flow<List<FavoriteComplex>> =
+        dao.observeAll().map { entities ->
+            entities.map { FavoriteComplex(it.kaptCode, it.name, it.regionLabel) }
+        }
+
+    override val favoriteCodes: Flow<Set<String>> =
+        dao.observeAll().map { entities -> entities.map { it.kaptCode }.toSet() }
+
+    override suspend fun toggle(complex: FavoriteComplex) {
+        if (dao.exists(complex.kaptCode)) {
+            dao.deleteByCode(complex.kaptCode)
+        } else {
+            dao.insert(
+                FavoriteComplexEntity(
+                    kaptCode = complex.kaptCode,
+                    name = complex.name,
+                    regionLabel = complex.regionLabel,
+                    savedAtMillis = System.currentTimeMillis(),
+                ),
+            )
+        }
+    }
+}

@@ -1,6 +1,7 @@
 package com.ams.youthhouse.app.di
 
 import com.ams.youthhouse.BuildConfig
+import com.ams.youthhouse.core.network.MosstisConfig
 import com.ams.youthhouse.core.network.NetworkConfig
 import dagger.Module
 import dagger.Provides
@@ -22,5 +23,12 @@ object NetworkConfigModule {
         baseUrl = BuildConfig.DATA_GO_KR_BASE_URL,
         serviceKey = BuildConfig.DATA_GO_KR_SERVICE_KEY,
         isLoggingEnabled = BuildConfig.DEBUG,
+    )
+
+    @Provides
+    @Singleton
+    fun provideMosstisConfig(): MosstisConfig = MosstisConfig(
+        baseUrl = BuildConfig.MOSSTIS_BASE_URL,
+        apiKey = BuildConfig.MOSSTIS_API_KEY,
     )
 }

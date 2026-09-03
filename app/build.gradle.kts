@@ -66,7 +66,7 @@ android {
         applicationId = "com.ams.youthhouse"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
+        versionCode = 2
         versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -74,6 +74,14 @@ android {
         // data.go.kr 오픈API 공통 게이트웨이. 세부 엔드포인트는 각 feature의 data 레이어에서 지정한다.
         buildConfigField("String", "DATA_GO_KR_BASE_URL", "\"https://apis.data.go.kr/\"")
         // 인증키는 변이마다 다를 수 있어 buildTypes에서 선언한다.
+
+        // 자체 백엔드(단지·실거래). local.properties에 MOSSTIS_API_KEY=... 로 둔다.
+        buildConfigField("String", "MOSSTIS_BASE_URL", "\"https://data.mosstis.com/\"")
+        buildConfigField(
+            "String",
+            "MOSSTIS_API_KEY",
+            "\"${secretProperty("local.properties", "MOSSTIS_API_KEY")}\"",
+        )
     }
 
     signingConfigs {
