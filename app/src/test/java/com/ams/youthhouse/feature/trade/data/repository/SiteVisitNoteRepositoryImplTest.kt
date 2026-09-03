@@ -4,6 +4,7 @@ import com.ams.youthhouse.feature.trade.data.local.SiteVisitNoteDao
 import com.ams.youthhouse.feature.trade.data.local.SiteVisitNoteEntity
 import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
 import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
+import com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition
 import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
 import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
 import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
@@ -81,6 +82,7 @@ class SiteVisitNoteRepositoryImplTest {
             mapOf(VisitCriterion.LIGHT to 4, VisitCriterion.NOISE to 3, VisitCriterion.PARKING to 2),
         ),
         walkToStationMinutes = 8,
+        elevatorCondition = ElevatorCondition.COMFORTABLE,
         defectStatus = DefectStatus.NONE,
         memo = memo,
         snapshot = ComplexSnapshot(
@@ -104,6 +106,7 @@ class SiteVisitNoteRepositoryImplTest {
         parkingScore = null,
         managementScore = null,
         walkToStationMinutes = null,
+        elevatorCondition = ElevatorCondition.UNCHECKED.name,
         defectStatus = DefectStatus.NONE.name,
         memo = "",
         builtYear = null,

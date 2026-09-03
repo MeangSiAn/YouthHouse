@@ -61,6 +61,7 @@ import com.ams.youthhouse.core.designsystem.theme.AppTextStyles
 import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
 import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
+import com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition
 import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
 import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
 import com.ams.youthhouse.feature.trade.presentation.component.labelRes
@@ -218,6 +219,11 @@ private fun NoteForm(
             shape = fieldShape,
         )
 
+        ElevatorField(
+            condition = uiState.elevatorCondition,
+            onChanged = { onAction(SiteVisitNoteContract.Action.ElevatorChanged(it)) },
+        )
+
         DefectField(
             status = uiState.defectStatus,
             onChanged = { onAction(SiteVisitNoteContract.Action.DefectChanged(it)) },
@@ -319,6 +325,29 @@ private fun RatingRow(
                         },
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ElevatorField(
+    condition: ElevatorCondition,
+    onChanged: (ElevatorCondition) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
+        Text(
+            text = stringResource(R.string.note_elevator),
+            style = AppTextStyles.monoCaption,
+            color = AppTheme.semanticColors.ink45,
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
+            ElevatorCondition.entries.forEach { candidate ->
+                FilterChip(
+                    selected = candidate == condition,
+                    onClick = { onChanged(candidate) },
+                    label = { Text(text = stringResource(candidate.labelRes())) },
+                )
             }
         }
     }
@@ -441,6 +470,7 @@ private fun SiteVisitNoteScreenPreview() {
                     ),
                 ),
                 walkMinutesText = "8",
+                elevatorCondition = ElevatorCondition.COMFORTABLE,
                 defectStatus = DefectStatus.NONE,
                 memo = "남향 채광 좋음. 다만 8층 이하는 앞동에 가림.",
             ),

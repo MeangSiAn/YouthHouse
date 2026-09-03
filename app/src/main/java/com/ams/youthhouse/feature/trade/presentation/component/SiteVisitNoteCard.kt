@@ -35,6 +35,7 @@ import com.ams.youthhouse.core.designsystem.theme.AppTextStyles
 import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
 import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
+import com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition
 import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
 import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
 import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
@@ -135,6 +136,15 @@ private fun SiteVisitNote.summaryChips(): List<String> = buildList {
     walkToStationMinutes?.let { minutes ->
         add(stringResource(R.string.note_walk_short, minutes))
     }
+    // 엘리베이터는 불편할 때만 알린다. "여유"는 굳이 칩 한 칸을 쓸 정보가 아니다.
+    if (elevatorCondition == ElevatorCondition.CROWDED ||
+        elevatorCondition == ElevatorCondition.NONE
+    ) {
+        add(
+            "${stringResource(R.string.note_elevator)} " +
+                stringResource(elevatorCondition.labelRes()),
+        )
+    }
     if (defectStatus == DefectStatus.FOUND) {
         add("${stringResource(R.string.note_defect)} ${stringResource(R.string.note_defect_found)}")
     }
@@ -177,6 +187,14 @@ fun VisitCriterion.labelRes(): Int = when (this) {
 }
 
 @StringRes
+fun ElevatorCondition.labelRes(): Int = when (this) {
+    ElevatorCondition.UNCHECKED -> R.string.note_elevator_unchecked
+    ElevatorCondition.COMFORTABLE -> R.string.note_elevator_comfortable
+    ElevatorCondition.CROWDED -> R.string.note_elevator_crowded
+    ElevatorCondition.NONE -> R.string.note_elevator_none
+}
+
+@StringRes
 fun DefectStatus.labelRes(): Int = when (this) {
     DefectStatus.UNCHECKED -> R.string.note_defect_unchecked
     DefectStatus.NONE -> R.string.note_defect_none
@@ -204,6 +222,7 @@ private fun SiteVisitNoteCardPreview() {
                     ),
                 ),
                 walkToStationMinutes = 8,
+                elevatorCondition = ElevatorCondition.CROWDED,
                 defectStatus = DefectStatus.NONE,
                 memo = "남향 채광 좋음. 다만 8층 이하는 앞동에 가림. 단지 안 경사가 있어 유모차는 불편할 듯.",
                 snapshot = ComplexSnapshot.EMPTY,

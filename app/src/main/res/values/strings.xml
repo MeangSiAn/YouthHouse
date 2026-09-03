@@ -35,6 +35,11 @@
     <string name="note_walk_unit">분</string>
     <string name="note_walk_minutes">%1$d분</string>
     <string name="note_walk_short">역 도보 %1$d분</string>
+    <string name="note_elevator">엘리베이터</string>
+    <string name="note_elevator_unchecked">미확인</string>
+    <string name="note_elevator_comfortable">여유</string>
+    <string name="note_elevator_crowded">붐빔</string>
+    <string name="note_elevator_none">없음</string>
     <string name="note_defect">누수·곰팡이</string>
     <string name="note_defect_unchecked">미확인</string>
     <string name="note_defect_none">없음</string>

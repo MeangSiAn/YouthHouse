@@ -3,6 +3,7 @@ package com.ams.youthhouse.feature.trade.data.mapper
 import com.ams.youthhouse.feature.trade.data.local.SiteVisitNoteEntity
 import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
 import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
+import com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition
 import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
 import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
 import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
@@ -20,6 +21,8 @@ fun SiteVisitNoteEntity.toDomain(): SiteVisitNote = SiteVisitNote(
         .with(VisitCriterion.PARKING, parkingScore)
         .with(VisitCriterion.MANAGEMENT, managementScore),
     walkToStationMinutes = walkToStationMinutes,
+    elevatorCondition = ElevatorCondition.entries.firstOrNull { it.name == elevatorCondition }
+        ?: ElevatorCondition.UNCHECKED,
     defectStatus = DefectStatus.entries.firstOrNull { it.name == defectStatus }
         ?: DefectStatus.UNCHECKED,
     memo = memo,
@@ -44,6 +47,7 @@ fun SiteVisitNote.toEntity(updatedAtMillis: Long): SiteVisitNoteEntity = SiteVis
     parkingScore = ratings[VisitCriterion.PARKING],
     managementScore = ratings[VisitCriterion.MANAGEMENT],
     walkToStationMinutes = walkToStationMinutes,
+    elevatorCondition = elevatorCondition.name,
     defectStatus = defectStatus.name,
     memo = memo,
     builtYear = snapshot.builtYear,

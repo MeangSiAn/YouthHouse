@@ -63,6 +63,9 @@ class SiteVisitNoteViewModel @Inject constructor(
                     copy(walkMinutesText = action.text.filter(Char::isDigit).take(MAX_WALK_DIGITS))
                 }
 
+            is SiteVisitNoteContract.Action.ElevatorChanged ->
+                updateState { copy(elevatorCondition = action.condition) }
+
             is SiteVisitNoteContract.Action.DefectChanged ->
                 updateState { copy(defectStatus = action.status) }
 
@@ -126,6 +129,7 @@ private fun SiteVisitNoteContract.State.fromExisting(note: SiteVisitNote) = copy
     viewedUnit = note.viewedUnit,
     ratings = note.ratings,
     walkMinutesText = note.walkToStationMinutes?.toString().orEmpty(),
+    elevatorCondition = note.elevatorCondition,
     defectStatus = note.defectStatus,
     memo = note.memo,
 )
@@ -138,6 +142,7 @@ private fun SiteVisitNoteContract.State.toNote() = SiteVisitNote(
     viewedUnit = viewedUnit.trim(),
     ratings = ratings,
     walkToStationMinutes = walkMinutes,
+    elevatorCondition = elevatorCondition,
     defectStatus = defectStatus,
     memo = memo.trim(),
     snapshot = snapshot,

@@ -37,6 +37,15 @@ data class VisitRatings(
 enum class DefectStatus { UNCHECKED, NONE, FOUND }
 
 /**
+ * 엘리베이터 체감. 기획서 dev2.0 임장노트의 "엘리베이터" 줄이다.
+ *
+ * 대수는 K-apt가 알려 주므로 노트에는 **현장에서만 알 수 있는 것**만 남긴다 —
+ * 대수가 같아도 출근 시간에 서는지 아닌지는 가 봐야 안다.
+ * 점수 4항목에 넣지 않은 이유는 기획서가 척도를 넷으로 고정했기 때문이다.
+ */
+enum class ElevatorCondition { UNCHECKED, COMFORTABLE, CROWDED, NONE }
+
+/**
  * 노트를 쓸 때 단지 상세에서 떠 온 값.
  *
  * 비교표는 네트워크 없이 이것만으로 그린다. 실거래는 "방문 당시" 값이라 지금과 다를 수
@@ -78,6 +87,7 @@ data class SiteVisitNote(
     val viewedUnit: String,
     val ratings: VisitRatings,
     val walkToStationMinutes: Int?,
+    val elevatorCondition: ElevatorCondition,
     val defectStatus: DefectStatus,
     val memo: String,
     val snapshot: ComplexSnapshot,

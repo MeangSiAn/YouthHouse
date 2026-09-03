@@ -57,6 +57,7 @@ import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.feature.trade.domain.VisitComparison
 import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
 import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
+import com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition
 import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
 import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
 import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
@@ -226,6 +227,18 @@ private fun CompareTable(
                 text = note.walkToStationMinutes?.let { stringResource(R.string.note_walk_minutes, it) }
                     ?: stringResource(R.string.compare_not_rated),
                 highlighted = note.kaptCode in comparison.shortestWalk,
+            )
+        }
+
+        CompareRow(label = stringResource(R.string.note_elevator), notes = notes) { note ->
+            CellText(
+                text = stringResource(note.elevatorCondition.labelRes()),
+                color = when (note.elevatorCondition) {
+                    ElevatorCondition.NONE, ElevatorCondition.CROWDED ->
+                        AppTheme.semanticColors.close
+                    ElevatorCondition.COMFORTABLE -> AppTheme.semanticColors.ink
+                    ElevatorCondition.UNCHECKED -> AppTheme.semanticColors.ink45
+                },
             )
         }
 
@@ -459,6 +472,7 @@ private fun previewNote(
         .with(VisitCriterion.NOISE, noise)
         .with(VisitCriterion.PARKING, parking),
     walkToStationMinutes = walk,
+    elevatorCondition = ElevatorCondition.COMFORTABLE,
     defectStatus = DefectStatus.NONE,
     memo = "남향 채광 좋음. 8층 이하는 앞동에 가림.",
     snapshot = ComplexSnapshot(

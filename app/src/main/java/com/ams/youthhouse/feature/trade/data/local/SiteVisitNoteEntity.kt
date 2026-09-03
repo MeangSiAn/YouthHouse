@@ -26,6 +26,8 @@ data class SiteVisitNoteEntity(
     val parkingScore: Int?,
     val managementScore: Int?,
     val walkToStationMinutes: Int?,
+    /** [com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition]의 이름. */
+    val elevatorCondition: String,
     /** [com.ams.youthhouse.feature.trade.domain.model.DefectStatus]의 이름. */
     val defectStatus: String,
     val memo: String,

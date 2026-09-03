@@ -2,6 +2,7 @@ package com.ams.youthhouse.feature.trade.domain
 
 import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
 import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
+import com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition
 import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
 import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
 import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
@@ -91,6 +92,7 @@ class VisitComparisonTest {
             .with(VisitCriterion.PARKING, parking)
             .with(VisitCriterion.MANAGEMENT, management),
         walkToStationMinutes = walk,
+        elevatorCondition = ElevatorCondition.UNCHECKED,
         defectStatus = DefectStatus.UNCHECKED,
         memo = "",
         snapshot = ComplexSnapshot.EMPTY,

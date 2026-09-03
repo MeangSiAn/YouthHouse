@@ -5,6 +5,7 @@ import com.ams.youthhouse.core.presentation.contract.UiEffect
 import com.ams.youthhouse.core.presentation.contract.UiState
 import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
 import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
+import com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition
 import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
 import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
 
@@ -28,6 +29,7 @@ object SiteVisitNoteContract {
         val viewedUnit: String = "",
         val ratings: VisitRatings = VisitRatings(),
         val walkMinutesText: String = "",
+        val elevatorCondition: ElevatorCondition = ElevatorCondition.UNCHECKED,
         val defectStatus: DefectStatus = DefectStatus.UNCHECKED,
         val memo: String = "",
         val isDatePickerShown: Boolean = false,
@@ -42,6 +44,7 @@ object SiteVisitNoteContract {
                 !ratings.isEmpty ||
                     memo.isNotBlank() ||
                     walkMinutes != null ||
+                    elevatorCondition != ElevatorCondition.UNCHECKED ||
                     defectStatus != DefectStatus.UNCHECKED ||
                     viewedUnit.isNotBlank()
                 )
@@ -54,6 +57,7 @@ object SiteVisitNoteContract {
         data class ViewedUnitChanged(val text: String) : Action
         data class RatingChanged(val criterion: VisitCriterion, val score: Int?) : Action
         data class WalkMinutesChanged(val text: String) : Action
+        data class ElevatorChanged(val condition: ElevatorCondition) : Action
         data class DefectChanged(val status: DefectStatus) : Action
         data class MemoChanged(val text: String) : Action
         data object SaveClicked : Action
