@@ -3,10 +3,12 @@ package com.ams.youthhouse.feature.trade.presentation
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -25,12 +28,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ams.youthhouse.R
@@ -45,7 +51,9 @@ import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.feature.trade.domain.model.AptComplex
 import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
 import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
+import com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition
 import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
+import com.ams.youthhouse.feature.trade.domain.model.RecentComplex
 import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
 import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
 import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
@@ -104,6 +112,19 @@ fun TradeScreen(
         if (uiState.isSearchMode) {
             searchResults(uiState, onAction)
         } else {
+            // 검색창 바로 아래 — 방금 보던 단지로 돌아가는 길이 가장 짧아야 한다.
+            if (uiState.recents.isNotEmpty()) {
+                item {
+                    RecentComplexRow(
+                        recents = uiState.recents,
+                        onClick = { recent ->
+                            onAction(
+                                TradeContract.Action.ComplexClicked(recent.kaptCode, recent.name),
+                            )
+                        },
+                    )
+                }
+            }
             favoriteComplexes(uiState, onAction)
             siteVisitNotes(uiState, onAction)
         }
@@ -283,6 +304,48 @@ private fun LazyListScope.favoriteComplexes(
     }
 }
 
+/**
+ * 최근에 열어 본 단지 줄.
+ *
+ * 섹션 제목을 달지 않는다 — 검색창에 붙어 있으면 무엇인지 설명 없이 읽히고,
+ * 제목을 달면 아래 "관심 단지"와 위계가 같아 보여 오히려 헷갈린다.
+ */
+@Composable
+private fun RecentComplexRow(
+    recents: List<RecentComplex>,
+    onClick: (RecentComplex) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+    ) {
+        recents.forEach { recent ->
+            SuggestionChip(
+                onClick = { onClick(recent) },
+                label = {
+                    Text(
+                        text = recent.name,
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
+                shape = MaterialTheme.shapes.large,
+                colors = SuggestionChipDefaults.suggestionChipColors(
+                    labelColor = AppTheme.semanticColors.ink70,
+                ),
+                border = SuggestionChipDefaults.suggestionChipBorder(
+                    enabled = true,
+                    borderColor = AppTheme.semanticColors.line,
+                ),
+            )
+        }
+    }
+}
+
 @Composable
 private fun ComplexRowGroup(content: @Composable () -> Unit) {
     Column(
@@ -345,6 +408,7 @@ private fun TradeScreenFavoritesPreview() {
                         viewedUnit = "84㎡ · 12층",
                         ratings = VisitRatings(mapOf(VisitCriterion.LIGHT to 4)),
                         walkToStationMinutes = 8,
+                        elevatorCondition = ElevatorCondition.COMFORTABLE,
                         defectStatus = DefectStatus.NONE,
                         memo = "남향 채광 좋음.",
                         snapshot = ComplexSnapshot.EMPTY,

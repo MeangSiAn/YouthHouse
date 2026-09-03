@@ -5,13 +5,16 @@ import androidx.room.Room
 import com.ams.youthhouse.core.network.di.MosstisApi
 import com.ams.youthhouse.feature.trade.data.api.MosstisAptApi
 import com.ams.youthhouse.feature.trade.data.local.FavoriteComplexDao
+import com.ams.youthhouse.feature.trade.data.local.RecentComplexDao
 import com.ams.youthhouse.feature.trade.data.local.SiteVisitNoteDao
 import com.ams.youthhouse.feature.trade.data.local.TradeDatabase
 import com.ams.youthhouse.feature.trade.data.repository.ComplexRepositoryImpl
 import com.ams.youthhouse.feature.trade.data.repository.FavoriteComplexRepositoryImpl
+import com.ams.youthhouse.feature.trade.data.repository.RecentComplexRepositoryImpl
 import com.ams.youthhouse.feature.trade.data.repository.SiteVisitNoteRepositoryImpl
 import com.ams.youthhouse.feature.trade.domain.repository.ComplexRepository
 import com.ams.youthhouse.feature.trade.domain.repository.FavoriteComplexRepository
+import com.ams.youthhouse.feature.trade.domain.repository.RecentComplexRepository
 import com.ams.youthhouse.feature.trade.domain.repository.SiteVisitNoteRepository
 import dagger.Binds
 import dagger.Module
@@ -52,6 +55,10 @@ object TradeApiModule {
     @Provides
     fun provideSiteVisitNoteDao(database: TradeDatabase): SiteVisitNoteDao =
         database.siteVisitNoteDao()
+
+    @Provides
+    fun provideRecentComplexDao(database: TradeDatabase): RecentComplexDao =
+        database.recentComplexDao()
 }
 
 @Module
@@ -73,4 +80,10 @@ abstract class TradeRepositoryModule {
     abstract fun bindSiteVisitNoteRepository(
         impl: SiteVisitNoteRepositoryImpl,
     ): SiteVisitNoteRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRecentComplexRepository(
+        impl: RecentComplexRepositoryImpl,
+    ): RecentComplexRepository
 }

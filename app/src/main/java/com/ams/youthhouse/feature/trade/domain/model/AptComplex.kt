@@ -138,3 +138,13 @@ data class FavoriteComplex(
     val name: String,
     val regionLabel: String,
 )
+
+/**
+ * 최근에 열어 본 단지. 필드는 [FavoriteComplex]와 같지만 뜻이 다르다 —
+ * 이쪽은 사용자가 고른 것이 아니라 앱이 관찰한 흔적이라 지워도 잃을 것이 없다.
+ */
+data class RecentComplex(
+    val kaptCode: String,
+    val name: String,
+    val regionLabel: String,
+)

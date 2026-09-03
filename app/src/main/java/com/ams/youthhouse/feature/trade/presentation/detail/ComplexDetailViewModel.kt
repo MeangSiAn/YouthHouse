@@ -7,8 +7,10 @@ import com.ams.youthhouse.core.presentation.base.BaseViewModel
 import com.ams.youthhouse.core.ui.error.toUserMessageRes
 import com.ams.youthhouse.feature.trade.domain.model.ComplexDetail
 import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
+import com.ams.youthhouse.feature.trade.domain.model.RecentComplex
 import com.ams.youthhouse.feature.trade.domain.repository.ComplexRepository
 import com.ams.youthhouse.feature.trade.domain.repository.FavoriteComplexRepository
+import com.ams.youthhouse.feature.trade.domain.repository.RecentComplexRepository
 import com.ams.youthhouse.feature.trade.domain.repository.SiteVisitNoteRepository
 import com.ams.youthhouse.feature.trade.presentation.navigation.ComplexDetailDestination
 import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
@@ -24,6 +26,7 @@ class ComplexDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val complexRepository: ComplexRepository,
     private val favoriteComplexRepository: FavoriteComplexRepository,
+    private val recentComplexRepository: RecentComplexRepository,
     siteVisitNoteRepository: SiteVisitNoteRepository,
 ) : BaseViewModel<
     ComplexDetailContract.State,
@@ -67,6 +70,14 @@ class ComplexDetailViewModel @Inject constructor(
                         selectedArea = detail.areas.firstOrNull(),
                     )
                 }
+                // 조회에 성공한 뒤에 남긴다 — 열리지도 않은 단지를 최근 목록에 올리지 않는다.
+                recentComplexRepository.record(
+                    RecentComplex(
+                        kaptCode = detail.kaptCode,
+                        name = detail.name,
+                        regionLabel = detail.address.orEmpty(),
+                    ),
+                )
             } catch (exception: CancellationException) {
                 throw exception
             } catch (throwable: Throwable) {

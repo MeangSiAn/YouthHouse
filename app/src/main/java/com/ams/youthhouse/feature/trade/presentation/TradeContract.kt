@@ -6,6 +6,7 @@ import com.ams.youthhouse.core.presentation.contract.UiEffect
 import com.ams.youthhouse.core.presentation.contract.UiState
 import com.ams.youthhouse.feature.trade.domain.model.AptComplex
 import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
+import com.ams.youthhouse.feature.trade.domain.model.RecentComplex
 import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
 import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
 
@@ -21,6 +22,8 @@ object TradeContract {
         val results: List<AptComplex> = emptyList(),
         @param:StringRes val searchErrorRes: Int? = null,
         val favorites: List<FavoriteComplex> = emptyList(),
+        /** 검색창 아래 줄. 최근에 연 단지로 한 번에 돌아가는 길이다. */
+        val recents: List<RecentComplex> = emptyList(),
         val isFavoritesLoaded: Boolean = false,
         val notes: List<SiteVisitNote> = emptyList(),
     ) : UiState {

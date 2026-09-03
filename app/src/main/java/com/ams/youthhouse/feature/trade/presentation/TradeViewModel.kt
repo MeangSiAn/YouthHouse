@@ -5,6 +5,7 @@ import com.ams.youthhouse.core.presentation.base.BaseViewModel
 import com.ams.youthhouse.core.ui.error.toUserMessageRes
 import com.ams.youthhouse.feature.trade.domain.repository.ComplexRepository
 import com.ams.youthhouse.feature.trade.domain.repository.FavoriteComplexRepository
+import com.ams.youthhouse.feature.trade.domain.repository.RecentComplexRepository
 import com.ams.youthhouse.feature.trade.domain.repository.SiteVisitNoteRepository
 import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class TradeViewModel @Inject constructor(
     private val complexRepository: ComplexRepository,
     favoriteComplexRepository: FavoriteComplexRepository,
+    recentComplexRepository: RecentComplexRepository,
     siteVisitNoteRepository: SiteVisitNoteRepository,
 ) : BaseViewModel<
     TradeContract.State,
@@ -42,6 +44,10 @@ class TradeViewModel @Inject constructor(
             .onEach { favorites ->
                 updateState { copy(favorites = favorites, isFavoritesLoaded = true) }
             }
+            .launchIn(viewModelScope)
+
+        recentComplexRepository.recents
+            .onEach { recents -> updateState { copy(recents = recents) } }
             .launchIn(viewModelScope)
 
         siteVisitNoteRepository.notes
