@@ -40,12 +40,18 @@
     <string name="trade_favorites_empty_title">아직 관심 단지가 없습니다</string>
     <string name="trade_favorites_empty_description">단지를 검색해 상세 화면에서 하트를 누르면\n여기에 모입니다.</string>
     <string name="trade_footnote">실거래가는 국토교통부, 단지 정보는 K-apt 자료를 가공한 것입니다. 신고 지연·정정으로 실제와 다를 수 있습니다.</string>
+    <!-- 단지 요약 -->
     <string name="complex_built">준공</string>
     <string name="complex_built_year">%1$s년</string>
     <string name="complex_households">세대수</string>
     <string name="complex_dongs">동수</string>
     <string name="complex_dong_count">%1$s개동</string>
+    <string name="complex_top_floor">최고층</string>
     <string name="complex_heating">난방</string>
+    <string name="complex_floor">%1$d층</string>
+    <string name="complex_unit_count">%1$s대</string>
+
+    <!-- 실거래 -->
     <string name="complex_section_trend">실거래 추이</string>
     <string name="complex_trend_window">최근 12개월</string>
     <string name="complex_latest_deal">최근 실거래</string>
@@ -54,7 +60,42 @@
         <item quantity="other">%d건</item>
     </plurals>
     <string name="complex_no_deals_title">최근 12개월 거래가 없습니다</string>
-    <string name="complex_floor">%1$d층</string>
+
+    <!-- 평형 구성 -->
+    <string name="complex_section_area_mix">평형 구성</string>
+    <string name="complex_area_under_60">전용 60㎡ 이하</string>
+    <string name="complex_area_60_85">전용 60~85㎡</string>
+    <string name="complex_area_85_135">전용 85~135㎡</string>
+    <string name="complex_area_over_135">전용 135㎡ 초과</string>
+
+    <!-- 단지 정보 -->
+    <string name="complex_section_building">단지 정보</string>
+    <string name="complex_source_kapt">K-apt</string>
+    <string name="complex_house_type">주택유형</string>
+    <string name="complex_hall_type">현관구조</string>
+    <string name="complex_structure">건물구조</string>
+    <string name="complex_builder">건설사</string>
+    <string name="complex_developer">시행사</string>
+    <string name="complex_management">관리방식</string>
+    <string name="complex_security">경비업체</string>
+    <string name="complex_elevator">승강기</string>
+    <string name="complex_parking">주차</string>
+    <string name="complex_parking_ground">지상 %1$s</string>
+    <string name="complex_parking_underground">지하 %1$s</string>
+    <string name="complex_ev_charger">전기차 충전기</string>
+    <string name="complex_cctv">CCTV</string>
+
+    <!-- 교통 -->
+    <string name="complex_section_transit">교통</string>
+    <string name="complex_subway">지하철</string>
+    <string name="complex_bus">버스</string>
+    <string name="complex_walk_time">도보 %1$s</string>
+
+    <!-- 주변 시설 -->
+    <string name="complex_section_surroundings">주변 시설</string>
+    <string name="complex_facility_education">교육</string>
+    <string name="complex_facility_convenient">편의</string>
+    <string name="complex_facility_welfare">단지 내</string>
 
     <!-- 마이(설정) -->
     <string name="my_privacy_title">🔒 개인정보를 수집하지 않습니다</string>

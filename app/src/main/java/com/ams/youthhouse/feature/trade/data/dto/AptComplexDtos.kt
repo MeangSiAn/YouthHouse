@@ -33,7 +33,12 @@ data class ComplexDetailResponseDto(
     val deals: DealsBlockDto? = null,
 )
 
-/** K-apt 기본 정보 65필드 중 화면이 쓰는 것만 남긴다. 나머지는 ignoreUnknownKeys가 버린다. */
+/**
+ * K-apt 기본 정보 65필드 중 화면이 쓰는 것만 남긴다. 나머지는 ignoreUnknownKeys가 버린다.
+ *
+ * **타입이 필드마다 제각각이다.** 세대수는 실수(`671.0`), 동수·주차대수는 문자열(`"8"`),
+ * 승강기·충전기는 정수로 온다. 원문 타입 그대로 받고 도메인 변환에서 정수로 맞춘다.
+ */
 @Serializable
 data class ComplexInfoDto(
     val kaptName: String? = null,
@@ -41,13 +46,35 @@ data class ComplexInfoDto(
     val doroJuso: String? = null,
     /** `YYYYMMDD` 사용승인일 */
     val kaptUsedate: String? = null,
-    /** 세대수. API가 `671.0`처럼 실수로 준다. */
     val kaptdaCnt: Double? = null,
-    /** 동수. API가 `"8"`처럼 문자열로 준다. */
     val kaptDongCnt: String? = null,
+    val kaptTopFloor: Int? = null,
     val codeHeatNm: String? = null,
-    val kaptBcompany: String? = null,
     val codeAptNm: String? = null,
+    val codeHallNm: String? = null,
+    val codeStr: String? = null,
+    val codeMgrNm: String? = null,
+    val kaptBcompany: String? = null,
+    val kaptAcompany: String? = null,
+    val kaptdSecCom: String? = null,
+    val kaptdEcnt: Int? = null,
+    val kaptdPcnt: String? = null,
+    val kaptdPcntu: String? = null,
+    val kaptdCccnt: String? = null,
+    /** 전용 60㎡ 이하 세대수. 네 구간 모두 실수로 온다. */
+    val kaptMparea60: Double? = null,
+    val kaptMparea85: Double? = null,
+    val kaptMparea135: Double? = null,
+    val kaptMparea136: Double? = null,
+    val kaptdWtimebus: String? = null,
+    val subwayLine: String? = null,
+    val subwayStation: String? = null,
+    val kaptdWtimesub: String? = null,
+    val convenientFacility: String? = null,
+    val educationFacility: String? = null,
+    val welfareFacility: String? = null,
+    val groundElChargerCnt: Int? = null,
+    val undergroundElChargerCnt: Int? = null,
 )
 
 @Serializable
