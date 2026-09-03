@@ -7,6 +7,7 @@ import com.ams.youthhouse.core.presentation.contract.UiAction
 import com.ams.youthhouse.core.presentation.contract.UiEffect
 import com.ams.youthhouse.core.presentation.contract.UiState
 import com.ams.youthhouse.feature.home.presentation.model.HomeSummaryUiModel
+import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
 
 /** 홈이 그리는 세 가지 화면. 기획서 SCREEN 02 / 10 / 01에 대응한다. */
 enum class HomeMode {
@@ -29,6 +30,12 @@ object HomeContract {
         val isLoading: Boolean = false,
         val summary: HomeSummaryUiModel? = null,
         @param:StringRes val errorMessageRes: Int? = null,
+        /** 찜한 공고 중 접수중이면서 마감이 가까운 몇 건. 지역 필터와 무관하다. */
+        val upcomingFavorites: List<NoticeUiModel> = emptyList(),
+        val favoriteNoticeCount: Int = 0,
+        /** 관심 단지 몇 곳. 실거래가는 싣지 않는다 — 단지마다 상세를 한 번씩 더 불러야 한다. */
+        val favoriteComplexes: List<FavoriteComplex> = emptyList(),
+        val favoriteComplexCount: Int = 0,
     ) : UiState {
 
         val mode: HomeMode
@@ -43,11 +50,17 @@ object HomeContract {
         data class RegionSelected(val region: NoticeRegion?) : Action
         data class NoticeClicked(val notice: NoticeUiModel) : Action
         data object SeeAllNoticesClicked : Action
+        data object SeeAllScheduleClicked : Action
+        data class ComplexClicked(val complex: FavoriteComplex) : Action
+        data object SeeAllComplexesClicked : Action
         data object RetryClicked : Action
     }
 
     sealed interface Effect : UiEffect {
         data class NavigateToDetail(val notice: NoticeUiModel) : Effect
         data object NavigateToNoticeList : Effect
+        data object NavigateToSchedule : Effect
+        data class NavigateToComplexDetail(val kaptCode: String, val name: String) : Effect
+        data object NavigateToTrade : Effect
     }
 }

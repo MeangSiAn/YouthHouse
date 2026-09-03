@@ -13,11 +13,17 @@ data object HomeDestination
 fun NavGraphBuilder.homeScreen(
     onNoticeClick: (NoticeUiModel) -> Unit,
     onSeeAllNoticesClick: () -> Unit,
+    onSeeAllScheduleClick: () -> Unit,
+    onComplexClick: (String, String) -> Unit,
+    onSeeAllComplexesClick: () -> Unit,
 ) {
     composable<HomeDestination> {
         HomeRoute(
             onNoticeClick = onNoticeClick,
             onSeeAllNoticesClick = onSeeAllNoticesClick,
+            onSeeAllScheduleClick = onSeeAllScheduleClick,
+            onComplexClick = onComplexClick,
+            onSeeAllComplexesClick = onSeeAllComplexesClick,
         )
     }
 }

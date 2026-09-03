@@ -12,6 +12,9 @@ import com.ams.youthhouse.core.ui.extension.CollectUiEffect
 fun HomeRoute(
     onNoticeClick: (NoticeUiModel) -> Unit,
     onSeeAllNoticesClick: () -> Unit,
+    onSeeAllScheduleClick: () -> Unit,
+    onComplexClick: (String, String) -> Unit,
+    onSeeAllComplexesClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -21,6 +24,10 @@ fun HomeRoute(
         when (effect) {
             is HomeContract.Effect.NavigateToDetail -> onNoticeClick(effect.notice)
             HomeContract.Effect.NavigateToNoticeList -> onSeeAllNoticesClick()
+            HomeContract.Effect.NavigateToSchedule -> onSeeAllScheduleClick()
+            is HomeContract.Effect.NavigateToComplexDetail ->
+                onComplexClick(effect.kaptCode, effect.name)
+            HomeContract.Effect.NavigateToTrade -> onSeeAllComplexesClick()
         }
     }
 

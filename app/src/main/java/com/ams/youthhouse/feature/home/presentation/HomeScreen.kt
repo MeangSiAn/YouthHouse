@@ -22,6 +22,8 @@ import com.ams.youthhouse.core.designsystem.component.BlockLabel
 import com.ams.youthhouse.core.designsystem.component.EmptyContent
 import com.ams.youthhouse.core.designsystem.component.FootnoteText
 import com.ams.youthhouse.core.designsystem.component.SectionHeader
+import com.ams.youthhouse.core.designsystem.component.SettingsRow
+import com.ams.youthhouse.core.designsystem.component.SettingsRowGroup
 import com.ams.youthhouse.core.designsystem.theme.AppSpacing
 import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.core.notice.presentation.component.NoticeItemCard
@@ -82,6 +84,11 @@ private fun LazyListScope.homeContent(
     // 두 번째 블록은 비워 둔 채 "매물 등록" 버튼만 놓여 있었다. 그 버튼은 준비 중 화면으로
     // 이어지는 막다른 길이라 블록째로 걷어냈다. 기능이 생기면 되살린다.
     noticeBlock(uiState = uiState, summary = summary, onAction = onAction)
+
+    // 아래 두 블록은 지역 필터와 무관하다 — 찜과 관심 단지는 사용자가 직접 고른 것이라
+    // 지역을 바꿨다고 사라지면 안 된다. 그래서 noticeBlock 바깥에 둔다.
+    scheduleSection(uiState = uiState, onAction = onAction)
+    favoriteComplexSection(uiState = uiState, onAction = onAction)
 
     item { FootnoteText(text = stringResource(R.string.home_footnote)) }
 }
@@ -149,6 +156,81 @@ private fun LazyListScope.noticeBlock(
                     openCount = summary.openCount,
                     upcomingCount = summary.upcomingCount,
                     closingTodayCount = summary.closingTodayCount,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 내 일정 — 찜한 공고 중 마감이 가까운 것 몇 건.
+ *
+ * 찜이 없거나 전부 마감됐으면 섹션째로 감춘다. 빈 카드를 두면 홈이 길어지기만 하고,
+ * 찜하는 법은 공고 탭에서 이미 안내한다.
+ */
+private fun LazyListScope.scheduleSection(
+    uiState: HomeContract.State,
+    onAction: (HomeContract.Action) -> Unit,
+) {
+    if (uiState.upcomingFavorites.isEmpty()) return
+
+    item {
+        SectionHeader(
+            title = stringResource(R.string.home_section_schedule),
+            trailingText = stringResource(
+                R.string.home_section_schedule_more,
+                uiState.favoriteNoticeCount,
+            ),
+            onTrailingClick = { onAction(HomeContract.Action.SeeAllScheduleClicked) },
+        )
+    }
+
+    item {
+        SettingsRowGroup {
+            uiState.upcomingFavorites.forEachIndexed { index, notice ->
+                SettingsRow(
+                    title = notice.title,
+                    description = notice.supplyInstitutionName,
+                    value = notice.statusLabel,
+                    onClick = { onAction(HomeContract.Action.NoticeClicked(notice)) },
+                    showDivider = index != uiState.upcomingFavorites.lastIndex,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 관심 단지 — 매매 탭에서 하트를 누른 단지.
+ *
+ * 기획서는 여기에 최근 실거래가까지 얹지만 싣지 않는다. 시세는 단지마다 상세를
+ * 한 번씩 더 불러야 나오는 값이라, 홈을 여는 것만으로 관심 단지 수만큼 요청이 나간다.
+ */
+private fun LazyListScope.favoriteComplexSection(
+    uiState: HomeContract.State,
+    onAction: (HomeContract.Action) -> Unit,
+) {
+    if (uiState.favoriteComplexes.isEmpty()) return
+
+    item {
+        SectionHeader(
+            title = stringResource(R.string.home_section_favorite_complex),
+            trailingText = stringResource(
+                R.string.home_section_favorite_complex_more,
+                uiState.favoriteComplexCount,
+            ),
+            onTrailingClick = { onAction(HomeContract.Action.SeeAllComplexesClicked) },
+        )
+    }
+
+    item {
+        SettingsRowGroup {
+            uiState.favoriteComplexes.forEachIndexed { index, complex ->
+                SettingsRow(
+                    title = complex.name,
+                    description = complex.regionLabel.ifBlank { null },
+                    onClick = { onAction(HomeContract.Action.ComplexClicked(complex)) },
+                    showDivider = index != uiState.favoriteComplexes.lastIndex,
                 )
             }
         }

@@ -32,6 +32,9 @@ fun MainNavHost(
         homeScreen(
             onNoticeClick = navController::navigateToNoticeDetail,
             onSeeAllNoticesClick = { navController.navigateToTab(MainTab.NOTICE) },
+            onSeeAllScheduleClick = { navController.navigateToTab(MainTab.SCHEDULE) },
+            onComplexClick = navController::navigateToComplexDetail,
+            onSeeAllComplexesClick = { navController.navigateToTab(MainTab.TRADE) },
         )
         noticeScreen(onNoticeClick = navController::navigateToNoticeDetail)
         noticeDetailScreen(onBackClick = { navController.popBackStack() })

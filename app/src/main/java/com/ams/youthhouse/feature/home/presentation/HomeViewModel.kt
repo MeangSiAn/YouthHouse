@@ -7,12 +7,16 @@ import com.ams.youthhouse.core.notice.domain.model.Notice
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory.RENTAL
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory.SALE
 import com.ams.youthhouse.core.notice.domain.model.NoticeRegion
+import com.ams.youthhouse.core.notice.domain.repository.FavoriteNoticeRepository
 import com.ams.youthhouse.core.notice.domain.repository.NoticeFilterRepository
 import com.ams.youthhouse.core.notice.domain.repository.NoticeRepository
 import com.ams.youthhouse.core.presentation.base.BaseViewModel
 import com.ams.youthhouse.core.ui.error.toUserMessageRes
 import com.ams.youthhouse.feature.home.domain.toHomeSummary
+import com.ams.youthhouse.core.notice.presentation.model.NoticeStatus
+import com.ams.youthhouse.core.notice.presentation.model.toUiModel as toNoticeUiModel
 import com.ams.youthhouse.feature.home.presentation.model.toUiModel
+import com.ams.youthhouse.feature.trade.domain.repository.FavoriteComplexRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -28,6 +32,10 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val noticeRepository: NoticeRepository,
     private val noticeFilterRepository: NoticeFilterRepository,
+    // 홈은 여러 슬라이스의 요약을 모으는 화면이라 trade의 **도메인 인터페이스**까지는 참조한다.
+    // 화면·구현에는 의존하지 않으므로 단지 상세로 가는 길은 navigation 콜백이 잇는다.
+    favoriteNoticeRepository: FavoriteNoticeRepository,
+    favoriteComplexRepository: FavoriteComplexRepository,
     private val todayProvider: TodayProvider,
 ) : BaseViewModel<
     HomeContract.State,
@@ -43,6 +51,32 @@ class HomeViewModel @Inject constructor(
         noticeFilterRepository.selectedRegion
             .distinctUntilChanged()
             .onEach { region -> load(region) }
+            .launchIn(viewModelScope)
+
+        favoriteNoticeRepository.favorites
+            .onEach { favorites ->
+                val today = todayProvider.today()
+                val upcoming = favorites
+                    .map { notice -> notice.toNoticeUiModel(today) }
+                    // 접수중인 것만 "일정"이다. 마감된 찜은 이력이라 내 일정 탭에서 본다.
+                    .filter { it.status == NoticeStatus.OPEN || it.status == NoticeStatus.URGENT }
+                    .sortedBy { it.source.period.endDate }
+                    .take(HOME_SCHEDULE_COUNT)
+                updateState {
+                    copy(upcomingFavorites = upcoming, favoriteNoticeCount = favorites.size)
+                }
+            }
+            .launchIn(viewModelScope)
+
+        favoriteComplexRepository.favorites
+            .onEach { complexes ->
+                updateState {
+                    copy(
+                        favoriteComplexes = complexes.take(HOME_COMPLEX_COUNT),
+                        favoriteComplexCount = complexes.size,
+                    )
+                }
+            }
             .launchIn(viewModelScope)
     }
 
@@ -61,6 +95,23 @@ class HomeViewModel @Inject constructor(
 
             HomeContract.Action.SeeAllNoticesClicked -> {
                 sendEffect(HomeContract.Effect.NavigateToNoticeList)
+            }
+
+            HomeContract.Action.SeeAllScheduleClicked -> {
+                sendEffect(HomeContract.Effect.NavigateToSchedule)
+            }
+
+            is HomeContract.Action.ComplexClicked -> {
+                sendEffect(
+                    HomeContract.Effect.NavigateToComplexDetail(
+                        kaptCode = action.complex.kaptCode,
+                        name = action.complex.name,
+                    ),
+                )
+            }
+
+            HomeContract.Action.SeeAllComplexesClicked -> {
+                sendEffect(HomeContract.Effect.NavigateToTrade)
             }
 
             HomeContract.Action.RetryClicked -> load(currentState.selectedRegion)
@@ -140,5 +191,9 @@ class HomeViewModel @Inject constructor(
          * 중복 제거 후 카드가 1장만 남는다. 행당 약 1.4KB라 넉넉히 받아 거른다.
          */
         const val UNSET_REGION_PREVIEW_COUNT = 10
+
+        /** 홈은 요약이다. 더 보려면 해당 탭으로 간다(기획서 홈 "내 일정" 두 줄). */
+        const val HOME_SCHEDULE_COUNT = 2
+        const val HOME_COMPLEX_COUNT = 2
     }
 }
