@@ -1,4 +1,4 @@
-package com.ams.youthhouse.feature.trade.data.local
+package com.ams.youthhouse.core.complex.data.local
 
 import androidx.room.Dao
 import androidx.room.Entity

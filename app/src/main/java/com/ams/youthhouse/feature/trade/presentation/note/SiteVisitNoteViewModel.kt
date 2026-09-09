@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ams.youthhouse.core.common.time.TodayProvider
 import com.ams.youthhouse.core.presentation.base.BaseViewModel
-import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
-import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
-import com.ams.youthhouse.feature.trade.domain.repository.SiteVisitNoteRepository
+import com.ams.youthhouse.core.complex.domain.model.ComplexSnapshot
+import com.ams.youthhouse.core.complex.domain.model.SiteVisitNote
+import com.ams.youthhouse.core.complex.domain.repository.SiteVisitNoteRepository
 import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first

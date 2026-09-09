@@ -18,8 +18,8 @@ import com.ams.youthhouse.core.notice.presentation.model.NoticeStatus
 import com.ams.youthhouse.core.notice.presentation.model.toUiModel as toNoticeUiModel
 import com.ams.youthhouse.feature.home.presentation.model.toHomeVisitUiModel
 import com.ams.youthhouse.feature.home.presentation.model.toUiModel
-import com.ams.youthhouse.feature.trade.domain.repository.FavoriteComplexRepository
-import com.ams.youthhouse.feature.trade.domain.repository.SiteVisitNoteRepository
+import com.ams.youthhouse.core.complex.domain.repository.FavoriteComplexRepository
+import com.ams.youthhouse.core.complex.domain.repository.SiteVisitNoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job

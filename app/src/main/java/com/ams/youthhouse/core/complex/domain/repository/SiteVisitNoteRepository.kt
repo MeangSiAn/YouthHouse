@@ -1,6 +1,6 @@
-package com.ams.youthhouse.feature.trade.domain.repository
+package com.ams.youthhouse.core.complex.domain.repository
 
-import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
+import com.ams.youthhouse.core.complex.domain.model.SiteVisitNote
 import kotlinx.coroutines.flow.Flow
 
 /** 임장노트 저장소. 기기 안에만 있고 서버로 가지 않는다. */

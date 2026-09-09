@@ -34,7 +34,7 @@ import com.ams.youthhouse.core.common.format.formatManwonAsEokMan
 import com.ams.youthhouse.core.designsystem.theme.AppSpacing
 import com.ams.youthhouse.core.designsystem.theme.AppTextStyles
 import com.ams.youthhouse.core.designsystem.theme.AppTheme
-import com.ams.youthhouse.feature.trade.domain.model.TrendPoint
+import com.ams.youthhouse.core.complex.domain.model.TrendPoint
 import kotlin.math.min
 import kotlin.math.roundToInt
 

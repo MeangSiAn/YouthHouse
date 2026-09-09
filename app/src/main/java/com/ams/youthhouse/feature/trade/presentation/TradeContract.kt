@@ -4,10 +4,10 @@ import androidx.annotation.StringRes
 import com.ams.youthhouse.core.presentation.contract.UiAction
 import com.ams.youthhouse.core.presentation.contract.UiEffect
 import com.ams.youthhouse.core.presentation.contract.UiState
-import com.ams.youthhouse.feature.trade.domain.model.AptComplex
-import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
-import com.ams.youthhouse.feature.trade.domain.model.RecentComplex
-import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
+import com.ams.youthhouse.core.complex.domain.model.AptComplex
+import com.ams.youthhouse.core.complex.domain.model.FavoriteComplex
+import com.ams.youthhouse.core.complex.domain.model.RecentComplex
+import com.ams.youthhouse.core.complex.domain.model.SiteVisitNote
 import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
 
 object TradeContract {

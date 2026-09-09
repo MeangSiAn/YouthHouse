@@ -2,9 +2,9 @@ package com.ams.youthhouse.feature.home.presentation.model
 
 import com.ams.youthhouse.feature.home.domain.isIncomplete
 import com.ams.youthhouse.feature.home.domain.isPlannedOn
-import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
-import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
-import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
+import com.ams.youthhouse.core.complex.domain.model.SiteVisitNote
+import com.ams.youthhouse.core.complex.domain.model.VisitCriterion
+import com.ams.youthhouse.core.complex.domain.model.VisitRatings
 import kotlin.math.roundToInt
 
 /**

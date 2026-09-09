@@ -1,4 +1,4 @@
-package com.ams.youthhouse.feature.trade.data.local
+package com.ams.youthhouse.core.complex.data.local
 
 import androidx.room.Dao
 import androidx.room.Database
@@ -39,8 +39,11 @@ interface FavoriteComplexDao {
 }
 
 /**
- * trade 슬라이스 전용 DB. notice 쪽 DB와 분리한다 —
+ * 단지 슬라이스 전용 DB. notice 쪽 DB와 분리한다 —
  * 두 슬라이스가 서로의 스키마 버전에 발목 잡히지 않게.
+ *
+ * 파일명은 `trade.db` 그대로다. 패키지를 core로 옮기면서 바꾸면
+ * 기기에 저장된 찜·관심단지·임장노트가 통째로 사라진다.
  */
 @Database(
     entities = [
@@ -52,7 +55,7 @@ interface FavoriteComplexDao {
     version = 3,
     exportSchema = false,
 )
-abstract class TradeDatabase : RoomDatabase() {
+abstract class ComplexDatabase : RoomDatabase() {
     abstract fun favoriteComplexDao(): FavoriteComplexDao
     abstract fun siteVisitNoteDao(): SiteVisitNoteDao
     abstract fun recentComplexDao(): RecentComplexDao

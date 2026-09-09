@@ -1,4 +1,4 @@
-package com.ams.youthhouse.feature.trade.data.local
+package com.ams.youthhouse.core.complex.data.local
 
 import androidx.room.Dao
 import androidx.room.Entity
@@ -26,9 +26,9 @@ data class SiteVisitNoteEntity(
     val parkingScore: Int?,
     val managementScore: Int?,
     val walkToStationMinutes: Int?,
-    /** [com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition]의 이름. */
+    /** [com.ams.youthhouse.core.complex.domain.model.ElevatorCondition]의 이름. */
     val elevatorCondition: String,
-    /** [com.ams.youthhouse.feature.trade.domain.model.DefectStatus]의 이름. */
+    /** [com.ams.youthhouse.core.complex.domain.model.DefectStatus]의 이름. */
     val defectStatus: String,
     val memo: String,
     val builtYear: String?,

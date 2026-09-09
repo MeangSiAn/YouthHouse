@@ -9,7 +9,7 @@ import com.ams.youthhouse.core.presentation.contract.UiState
 import com.ams.youthhouse.feature.home.presentation.guide.HomeGuide
 import com.ams.youthhouse.feature.home.presentation.model.HomeSummaryUiModel
 import com.ams.youthhouse.feature.home.presentation.model.HomeVisitUiModel
-import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
+import com.ams.youthhouse.core.complex.domain.model.FavoriteComplex
 
 /** 홈이 그리는 세 가지 화면. 기획서 SCREEN 02 / 10 / 01에 대응한다. */
 enum class HomeMode {

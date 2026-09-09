@@ -48,15 +48,15 @@ import com.ams.youthhouse.core.designsystem.theme.AppSize
 import com.ams.youthhouse.core.designsystem.theme.AppSpacing
 import com.ams.youthhouse.core.designsystem.theme.AppTextStyles
 import com.ams.youthhouse.core.designsystem.theme.AppTheme
-import com.ams.youthhouse.feature.trade.domain.model.AptComplex
-import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
-import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
-import com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition
-import com.ams.youthhouse.feature.trade.domain.model.FavoriteComplex
-import com.ams.youthhouse.feature.trade.domain.model.RecentComplex
-import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
-import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
-import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
+import com.ams.youthhouse.core.complex.domain.model.AptComplex
+import com.ams.youthhouse.core.complex.domain.model.ComplexSnapshot
+import com.ams.youthhouse.core.complex.domain.model.DefectStatus
+import com.ams.youthhouse.core.complex.domain.model.ElevatorCondition
+import com.ams.youthhouse.core.complex.domain.model.FavoriteComplex
+import com.ams.youthhouse.core.complex.domain.model.RecentComplex
+import com.ams.youthhouse.core.complex.domain.model.SiteVisitNote
+import com.ams.youthhouse.core.complex.domain.model.VisitCriterion
+import com.ams.youthhouse.core.complex.domain.model.VisitRatings
 import com.ams.youthhouse.feature.trade.presentation.component.SiteVisitNoteCard
 
 /**

@@ -1,7 +1,7 @@
-package com.ams.youthhouse.feature.trade.domain.repository
+package com.ams.youthhouse.core.complex.domain.repository
 
-import com.ams.youthhouse.feature.trade.domain.model.AptComplex
-import com.ams.youthhouse.feature.trade.domain.model.ComplexDetail
+import com.ams.youthhouse.core.complex.domain.model.AptComplex
+import com.ams.youthhouse.core.complex.domain.model.ComplexDetail
 
 interface ComplexRepository {
 

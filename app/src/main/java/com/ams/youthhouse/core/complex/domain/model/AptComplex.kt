@@ -1,4 +1,4 @@
-package com.ams.youthhouse.feature.trade.domain.model
+package com.ams.youthhouse.core.complex.domain.model
 
 /**
  * 단지 검색 결과 한 건. K-apt 단지 목록(자체 백엔드 적재본)에서 온다.

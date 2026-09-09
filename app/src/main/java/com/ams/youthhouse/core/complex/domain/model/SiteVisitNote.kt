@@ -1,4 +1,4 @@
-package com.ams.youthhouse.feature.trade.domain.model
+package com.ams.youthhouse.core.complex.domain.model
 
 /**
  * 현장 점검 항목. 기획서가 네 개로 고정했다 — 현장에서 한 손으로 찍을 수 있는 수.

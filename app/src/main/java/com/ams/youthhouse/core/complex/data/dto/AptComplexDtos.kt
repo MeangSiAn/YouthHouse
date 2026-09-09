@@ -1,4 +1,4 @@
-package com.ams.youthhouse.feature.trade.data.dto
+package com.ams.youthhouse.core.complex.data.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

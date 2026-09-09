@@ -2,7 +2,7 @@ package com.ams.youthhouse.feature.trade.presentation.compare
 
 import androidx.lifecycle.viewModelScope
 import com.ams.youthhouse.core.presentation.base.BaseViewModel
-import com.ams.youthhouse.feature.trade.domain.repository.SiteVisitNoteRepository
+import com.ams.youthhouse.core.complex.domain.repository.SiteVisitNoteRepository
 import com.ams.youthhouse.feature.trade.presentation.navigation.SiteVisitNoteDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn

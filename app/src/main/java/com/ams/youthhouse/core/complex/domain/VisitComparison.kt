@@ -1,7 +1,7 @@
-package com.ams.youthhouse.feature.trade.domain
+package com.ams.youthhouse.core.complex.domain
 
-import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
-import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
+import com.ams.youthhouse.core.complex.domain.model.SiteVisitNote
+import com.ams.youthhouse.core.complex.domain.model.VisitCriterion
 
 /**
  * 비교표에서 강조할 "가장 나은" 단지들.

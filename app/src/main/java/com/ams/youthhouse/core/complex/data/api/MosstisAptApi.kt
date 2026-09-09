@@ -1,7 +1,7 @@
-package com.ams.youthhouse.feature.trade.data.api
+package com.ams.youthhouse.core.complex.data.api
 
-import com.ams.youthhouse.feature.trade.data.dto.ComplexDetailResponseDto
-import com.ams.youthhouse.feature.trade.data.dto.ComplexSearchResponseDto
+import com.ams.youthhouse.core.complex.data.dto.ComplexDetailResponseDto
+import com.ams.youthhouse.core.complex.data.dto.ComplexSearchResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

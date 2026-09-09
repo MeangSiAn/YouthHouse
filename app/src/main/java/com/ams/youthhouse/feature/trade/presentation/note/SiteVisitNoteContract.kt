@@ -3,11 +3,11 @@ package com.ams.youthhouse.feature.trade.presentation.note
 import com.ams.youthhouse.core.presentation.contract.UiAction
 import com.ams.youthhouse.core.presentation.contract.UiEffect
 import com.ams.youthhouse.core.presentation.contract.UiState
-import com.ams.youthhouse.feature.trade.domain.model.ComplexSnapshot
-import com.ams.youthhouse.feature.trade.domain.model.DefectStatus
-import com.ams.youthhouse.feature.trade.domain.model.ElevatorCondition
-import com.ams.youthhouse.feature.trade.domain.model.VisitCriterion
-import com.ams.youthhouse.feature.trade.domain.model.VisitRatings
+import com.ams.youthhouse.core.complex.domain.model.ComplexSnapshot
+import com.ams.youthhouse.core.complex.domain.model.DefectStatus
+import com.ams.youthhouse.core.complex.domain.model.ElevatorCondition
+import com.ams.youthhouse.core.complex.domain.model.VisitCriterion
+import com.ams.youthhouse.core.complex.domain.model.VisitRatings
 
 object SiteVisitNoteContract {
 

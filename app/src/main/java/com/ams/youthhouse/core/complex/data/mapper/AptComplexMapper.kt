@@ -1,19 +1,19 @@
-package com.ams.youthhouse.feature.trade.data.mapper
+package com.ams.youthhouse.core.complex.data.mapper
 
-import com.ams.youthhouse.feature.trade.data.dto.AreaTrendDto
-import com.ams.youthhouse.feature.trade.data.dto.ComplexDetailResponseDto
-import com.ams.youthhouse.feature.trade.data.dto.ComplexInfoDto
-import com.ams.youthhouse.feature.trade.data.dto.ComplexSummaryDto
-import com.ams.youthhouse.feature.trade.domain.model.AptComplex
-import com.ams.youthhouse.feature.trade.domain.model.AreaBucket
-import com.ams.youthhouse.feature.trade.domain.model.AreaBucketKind
-import com.ams.youthhouse.feature.trade.domain.model.AreaTrend
-import com.ams.youthhouse.feature.trade.domain.model.BuildingInfo
-import com.ams.youthhouse.feature.trade.domain.model.ComplexDeal
-import com.ams.youthhouse.feature.trade.domain.model.ComplexDetail
-import com.ams.youthhouse.feature.trade.domain.model.Surroundings
-import com.ams.youthhouse.feature.trade.domain.model.TransitInfo
-import com.ams.youthhouse.feature.trade.domain.model.TrendPoint
+import com.ams.youthhouse.core.complex.data.dto.AreaTrendDto
+import com.ams.youthhouse.core.complex.data.dto.ComplexDetailResponseDto
+import com.ams.youthhouse.core.complex.data.dto.ComplexInfoDto
+import com.ams.youthhouse.core.complex.data.dto.ComplexSummaryDto
+import com.ams.youthhouse.core.complex.domain.model.AptComplex
+import com.ams.youthhouse.core.complex.domain.model.AreaBucket
+import com.ams.youthhouse.core.complex.domain.model.AreaBucketKind
+import com.ams.youthhouse.core.complex.domain.model.AreaTrend
+import com.ams.youthhouse.core.complex.domain.model.BuildingInfo
+import com.ams.youthhouse.core.complex.domain.model.ComplexDeal
+import com.ams.youthhouse.core.complex.domain.model.ComplexDetail
+import com.ams.youthhouse.core.complex.domain.model.Surroundings
+import com.ams.youthhouse.core.complex.domain.model.TransitInfo
+import com.ams.youthhouse.core.complex.domain.model.TrendPoint
 
 fun ComplexSummaryDto.toDomain(): AptComplex = AptComplex(
     kaptCode = kaptCode,

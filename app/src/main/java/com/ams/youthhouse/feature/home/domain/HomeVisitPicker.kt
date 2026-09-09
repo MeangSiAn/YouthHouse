@@ -1,6 +1,6 @@
 package com.ams.youthhouse.feature.home.domain
 
-import com.ams.youthhouse.feature.trade.domain.model.SiteVisitNote
+import com.ams.youthhouse.core.complex.domain.model.SiteVisitNote
 
 /** 홈 임장기록 블록에 놓는 건수. 기획서 H-06은 예정 1 + 완료 2 구성이다. */
 const val HOME_VISIT_LIMIT = 3
