@@ -25,17 +25,8 @@ fun secretProperty(fileName: String, key: String): String = providers
     }
     .getOrElse("")
 
-// 공공데이터포털(data.go.kr) 인증키. local.properties에 DATA_GO_KR_SERVICE_KEY=... 형태로 둔다.
-//
-// 인증키는 계정 단위 하나이고, 운영계정 전환(2026-08 승인)은 키를 바꾸지 않고
-// 트래픽 한도만 올린다(개발 일 1,000건 → 운영 일 10만 건). 실호출로 확인했다.
-//
-// DATA_GO_KR_SERVICE_KEY_RELEASE는 나중에 개발용 계정을 따로 파서 키를 나눠 쓸 때를
-// 위한 분기다. local.properties에 그 줄이 있으면 release만 그 키를 쓰고, 없으면 공용 키를 쓴다.
-val dataGoKrServiceKey: String = secretProperty("local.properties", "DATA_GO_KR_SERVICE_KEY")
-val dataGoKrServiceKeyRelease: String =
-    secretProperty("local.properties", "DATA_GO_KR_SERVICE_KEY_RELEASE")
-        .ifBlank { dataGoKrServiceKey }
+// 공공데이터포털 인증키는 더 이상 앱에 들어가지 않는다.
+// 자체 백엔드(data.mosstis.com)가 대신 호출하므로 키는 서버에만 있다.
 
 // 업로드 키스토어. keystore.properties(= .gitignore 대상)에 아래 네 항목을 둔다.
 //   storeFile=/절대/경로/youthhouse-upload.jks   (~ 로 시작해도 된다)
@@ -71,11 +62,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // data.go.kr 오픈API 공통 게이트웨이. 세부 엔드포인트는 각 feature의 data 레이어에서 지정한다.
-        buildConfigField("String", "DATA_GO_KR_BASE_URL", "\"https://apis.data.go.kr/\"")
-        // 인증키는 변이마다 다를 수 있어 buildTypes에서 선언한다.
-
-        // 자체 백엔드(단지·실거래). local.properties에 MOSSTIS_API_KEY=... 로 둔다.
+        // 자체 백엔드(공고·단지·실거래). local.properties에 MOSSTIS_API_KEY=... 로 둔다.
         buildConfigField("String", "MOSSTIS_BASE_URL", "\"https://data.mosstis.com/\"")
         buildConfigField(
             "String",
@@ -102,18 +89,9 @@ android {
             // 앱 이름은 app/src/debug/res 에서 "(D)"를 붙여 구분한다.
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
-
-            // 인코딩된(URL-encoded) 인증키. ServiceKeyInterceptor가 재인코딩 없이 그대로 붙인다.
-            buildConfigField("String", "DATA_GO_KR_SERVICE_KEY", "\"$dataGoKrServiceKey\"")
         }
 
         release {
-            buildConfigField(
-                "String",
-                "DATA_GO_KR_SERVICE_KEY",
-                "\"$dataGoKrServiceKeyRelease\"",
-            )
-
             // R8 코드 축소·난독화·리소스 축소.
             //
             // AGP 9의 새 `optimization { enable = true }` DSL은 android.r8.gradual.support

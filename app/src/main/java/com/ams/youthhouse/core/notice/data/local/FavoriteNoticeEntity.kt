@@ -13,7 +13,7 @@ import androidx.room.PrimaryKey
  */
 @Entity(tableName = "favorite_notice")
 data class FavoriteNoticeEntity(
-    /** "RENTAL:21096" 형태. (category, pblancId)를 합친 공고 단위 키. */
+    /** 백엔드가 부여한 `notice_id`. 행 하나를 그대로 가리킨다. */
     @PrimaryKey val key: String,
     val category: String,
     val pblancId: String,

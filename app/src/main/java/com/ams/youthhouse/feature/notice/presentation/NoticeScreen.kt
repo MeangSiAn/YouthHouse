@@ -68,8 +68,8 @@ fun NoticeScreen(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        // 기획서 SCREEN 04: 정렬이 고정(마감 임박순이 아니라 서버 순서)이라
-        // 지금 무엇을 보고 있는지 헤더로 밝힌다.
+        // 정렬은 서버가 마감 임박순(apply_end 오름차순)으로 고정한다.
+        // 앱에는 정렬 선택지가 없으므로 헤더는 무엇을 보고 있는지만 밝힌다.
         Text(
             text = stringResource(R.string.notice_list_title),
             style = MaterialTheme.typography.titleLarge,
@@ -148,9 +148,10 @@ private fun NoticeList(
                     contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    // key를 지정하지 않는다 — 이 API는 같은 공고를 시군구별로 쪼개 보내고
-                    // 32개 필드가 완전히 동일한 행도 있어 고유 키를 만들 수 없다.
-                    // 중복 키를 주면 Compose가 "Key was already used"로 크래시한다.
+                    // key를 지정하지 않는다. 백엔드가 행마다 notice_id를 주고 지금은 전 건이
+                    // 고유하지만(실측 403건), 그 값은 행 내용에서 만든 해시라 원본 데이터에
+                    // 완전히 같은 행이 다시 생기면 겹칠 수 있다.
+                    // 중복 키는 "Key was already used" 크래시라 그 위험을 지지 않는다.
                     items(count = noticeItems.itemCount) { index ->
                         noticeItems[index]?.let { notice ->
                             NoticeItemCard(

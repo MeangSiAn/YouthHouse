@@ -1,11 +1,16 @@
 package com.ams.youthhouse.feature.notice.presentation.detail
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.ams.youthhouse.R
+import com.ams.youthhouse.core.common.time.TodayProvider
+import com.ams.youthhouse.core.notice.domain.model.mergeDetail
 import com.ams.youthhouse.core.notice.domain.repository.FavoriteNoticeRepository
+import com.ams.youthhouse.core.notice.domain.repository.NoticeRepository
 import com.ams.youthhouse.core.notice.domain.repository.toFavoriteKey
+import com.ams.youthhouse.core.notice.presentation.model.toUiModel
 import com.ams.youthhouse.core.presentation.base.BaseViewModel
 import com.ams.youthhouse.feature.notice.presentation.navigation.NoticeDetailDestination
 import com.ams.youthhouse.feature.notice.presentation.navigation.noticeDetailTypeMap
@@ -19,6 +24,8 @@ import javax.inject.Inject
 class NoticeDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val favoriteNoticeRepository: FavoriteNoticeRepository,
+    private val noticeRepository: NoticeRepository,
+    private val todayProvider: TodayProvider,
 ) : BaseViewModel<
     NoticeDetailContract.State,
     NoticeDetailContract.Action,
@@ -38,6 +45,30 @@ class NoticeDetailViewModel @Inject constructor(
         favoriteNoticeRepository.favoriteKeys
             .onEach { keys -> updateState { copy(isFavorite = key in keys) } }
             .launchIn(viewModelScope)
+
+        loadDetail()
+    }
+
+    /**
+     * 목록 응답에 없는 필드(주소·문의처·난방방식·잔금)를 단건 조회로 채운다.
+     *
+     * **실패해도 화면을 오류로 바꾸지 않는다.** 넘겨받은 스냅숏만으로도 공고는 읽히고,
+     * 무엇보다 찜한 공고가 마감되면 서버 목록에서 사라져 404가 정상 경로가 된다.
+     * 그때 "불러오지 못했습니다"를 띄우면 사용자가 저장해 둔 기록을 잃은 것처럼 보인다.
+     */
+    private fun loadDetail() {
+        val noticeId = currentState.notice.source.noticeId
+        if (noticeId.isBlank()) return
+
+        launchCatching(
+            onError = { throwable ->
+                Log.w(TAG, "공고 상세를 보강하지 못해 목록에서 받은 값으로 표시합니다", throwable)
+            },
+        ) {
+            val detail = noticeRepository.getNotice(noticeId)
+            val merged = currentState.notice.source.mergeDetail(detail)
+            updateState { copy(notice = merged.toUiModel(todayProvider.today())) }
+        }
     }
 
     private fun openUrl(url: String?) {
@@ -77,5 +108,9 @@ class NoticeDetailViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private companion object {
+        const val TAG = "NoticeDetailViewModel"
     }
 }

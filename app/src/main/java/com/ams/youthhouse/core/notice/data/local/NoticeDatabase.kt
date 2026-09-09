@@ -13,9 +13,9 @@ import androidx.room.RoomDatabase
  */
 @Database(
     entities = [FavoriteNoticeEntity::class],
-    // v2: 찜 키를 공고 단위 → 행 단위로 변경. 스키마는 같지만 키 포맷이 달라
+    // v3: 찜 키를 백엔드의 notice_id로 교체. 스키마는 같지만 키 포맷이 달라
     // 옛 행이 남으면 같은 찜이 두 번 저장될 수 있어 버전을 올려 비운다(미출시 상태라 무해).
-    version = 2,
+    version = 3,
     exportSchema = false,
 )
 abstract class NoticeDatabase : RoomDatabase() {

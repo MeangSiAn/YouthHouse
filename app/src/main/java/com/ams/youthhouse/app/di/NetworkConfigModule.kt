@@ -20,8 +20,6 @@ object NetworkConfigModule {
     @Provides
     @Singleton
     fun provideNetworkConfig(): NetworkConfig = NetworkConfig(
-        baseUrl = BuildConfig.DATA_GO_KR_BASE_URL,
-        serviceKey = BuildConfig.DATA_GO_KR_SERVICE_KEY,
         isLoggingEnabled = BuildConfig.DEBUG,
     )
 

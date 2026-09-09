@@ -10,16 +10,10 @@ sealed class AppException(cause: Throwable? = null) : Exception(cause) {
     /** 오프라인, 타임아웃 등 I/O 실패. */
     class Network(cause: Throwable) : AppException(cause)
 
-    /**
-     * HTTP 401/403 — data.go.kr 인증키가 등록되지 않았거나 승인되지 않음.
-     *
-     * 이 경우 서버는 JSON이 아니라 XML 본문을 돌려주지만,
-     * Retrofit이 비-2xx 응답에서 컨버터를 태우지 않고 곧바로 예외를 던지므로
-     * XML이 역직렬화에 도달하지 않는다.
-     */
+    /** HTTP 401/403 — 백엔드 API 키가 없거나 유효하지 않음. */
     class Unauthorized(val httpCode: Int, cause: Throwable? = null) : AppException(cause)
 
-    /** HTTP 4xx/5xx 또는 응답 header의 resultCode가 실패(`02`, `99` 등)인 경우. */
+    /** HTTP 4xx/5xx. */
     class Server(
         val code: String?,
         val serverMessage: String?,

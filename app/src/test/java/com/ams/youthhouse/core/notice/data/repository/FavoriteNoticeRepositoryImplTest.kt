@@ -43,35 +43,26 @@ class FavoriteNoticeRepositoryImplTest {
     }
 
     @Test
-    fun `같은 공고라도 시군구가 다른 행은 별개의 찜이다`() = runTest {
-        // 이 API는 한 공고를 시군구별 행으로 쪼개 내려보낸다.
+    fun `같은 공고라도 행이 다르면 별개의 찜이다`() = runTest {
+        // 백엔드는 한 공고를 시군구·단지별 행으로 쪼개 내려보내고 행마다 notice_id를 준다.
         // 영통구 행을 찜했는데 기흥구 행까지 켜지면 안 된다.
-        repository.toggle(notice("21096", districtName = "수원시 영통구"))
+        repository.toggle(notice("21096", noticeId = "row-yeongtong"))
 
         val keys = repository.favoriteKeys.first()
 
-        assertTrue(keys.single().districtName == "수원시 영통구")
-        assertTrue(notice("21096", districtName = "용인시 기흥구").toFavoriteKey() !in keys)
+        assertEquals("row-yeongtong", keys.single().noticeId)
+        assertTrue(notice("21096", noticeId = "row-giheung").toFavoriteKey() !in keys)
     }
 
     @Test
     fun `같은 행을 다시 토글하면 그 행만 해제된다`() = runTest {
-        repository.toggle(notice("21096", districtName = "수원시 영통구"))
-        repository.toggle(notice("21096", districtName = "용인시 기흥구"))
+        repository.toggle(notice("21096", noticeId = "row-yeongtong", districtName = "수원시 영통구"))
+        repository.toggle(notice("21096", noticeId = "row-giheung", districtName = "용인시 기흥구"))
 
-        repository.toggle(notice("21096", districtName = "수원시 영통구"))
+        repository.toggle(notice("21096", noticeId = "row-yeongtong", districtName = "수원시 영통구"))
 
         val remaining = repository.favorites.first()
         assertEquals(listOf("용인시 기흥구"), remaining.map { it.address.districtName })
-    }
-
-    @Test
-    fun `분야가 다르면 같은 pblancId라도 별개의 찜이다`() = runTest {
-        // 두 API의 ID 시퀀스가 별개라 미래 충돌을 배제할 수 없다.
-        repository.toggle(notice("21096", NoticeCategory.RENTAL))
-        repository.toggle(notice("21096", NoticeCategory.SALE))
-
-        assertEquals(2, repository.favoriteKeys.first().size)
     }
 
     @Test
@@ -79,7 +70,7 @@ class FavoriteNoticeRepositoryImplTest {
         repository.toggle(notice("valid"))
         dao.insert(
             FavoriteNoticeEntity(
-                key = "RENTAL:broken",
+                key = "notice-broken",
                 category = "RENTAL",
                 pblancId = "broken",
                 noticeJson = "{not-json",
@@ -94,7 +85,9 @@ class FavoriteNoticeRepositoryImplTest {
         pblancId: String,
         category: NoticeCategory = NoticeCategory.RENTAL,
         districtName: String = "울주군",
+        noticeId: String = "notice-$pblancId",
     ): Notice = Notice(
+        noticeId = noticeId,
         category = category,
         pblancId = pblancId,
         houseSn = 3,

@@ -5,26 +5,37 @@ import kotlinx.serialization.Serializable
 /**
  * 공공임대주택 모집공고 한 건.
  *
- * ## 이 API에는 고유 키가 없다
- * 같은 공고(`pblancId`)가 시군구별로 여러 행으로 쪼개져 내려오고
- * (`signguNm`·`sumSuplyCo`만 다름), 32개 필드가 완전히 동일한 행도 존재한다.
- * 따라서 `pblancId`도, `(pblancId, houseSn)` 조합도 목록 항목의 키가 될 수 없다.
- * 목록 UI는 위치 기반 키를 쓰고, 상세 화면은 모델 자체를 전달받는다.
- * 단, **공고 단위**로는 `(category, pblancId)`가 유효하다 — 찜이 이 키를 쓴다.
+ * ## 식별
+ * 같은 공고(`pblancId`)가 시군구·단지별로 여러 행으로 쪼개져 내려온다. 원본 API에는
+ * 그 행들을 구분할 키가 없었지만, 자체 백엔드가 행 내용으로 [noticeId]를 만들어 준다.
+ * 상세 재조회와 찜이 이 값을 쓴다.
+ *
+ * 내용 해시라서 **모든 필드가 똑같은 행끼리는 같은 값을 갖는다**(실측: 400행 중 1쌍).
+ * 화면에서도 구분되지 않는 행들이라 찜이 함께 켜져도 모순은 아니지만,
+ * Compose 목록 key로는 쓸 수 없다 — 중복 키는 즉시 크래시다.
  *
  * ## 날짜
  * `YYYYMMDD` 원문을 유지한다. 사전순 비교가 곧 시간순 비교라
  * 기간 판정이 문자열만으로 정확하고, `java.time` desugaring이 필요 없다.
+ * 백엔드는 `YYYY-MM-DD`로 주므로 매퍼가 하이픈을 지운다.
  *
  * ## 빈 값
- * API는 값 없음을 `null`이 아니라 빈 문자열/0으로 준다. 매퍼가 `null`로 정규화한다.
+ * 매퍼가 빈 문자열과 0을 `null`로 정규화한다.
  *
  * ## [Serializable]인 이유
- * 이 API는 식별자로 재조회할 방법이 없어, 찜은 모델 스냅숏 자체를 저장한다.
+ * 찜은 모델 스냅숏 자체를 저장한다. 마감된 공고는 백엔드 목록에서 사라지므로
+ * 재조회로는 복원할 수 없고, 저장해 둔 스냅숏만이 그 공고를 다시 그릴 수 있다.
  * kotlinx.serialization은 순수 Kotlin이라 domain 순수성 규칙과 충돌하지 않는다.
  */
 @Serializable
 data class Notice(
+    /**
+     * 백엔드가 행 내용으로 만든 해시.
+     *
+     * 기본값을 두는 이유: 이 필드가 생기기 전에 저장된 찜 스냅숏(JSON)에는 키가 없어,
+     * 기본값이 없으면 역직렬화가 통째로 실패한다.
+     */
+    val noticeId: String = "",
     val category: NoticeCategory,
     val pblancId: String,
     val houseSn: Int,
@@ -89,4 +100,38 @@ data class NoticePrice(
     val minInterimPayment: Int?,
     val minBalance: Int?,
     val minMonthlyRent: Int?,
+)
+
+/**
+ * 목록으로 받아 둔 공고에 상세 응답의 값을 덮어쓴다.
+ *
+ * 상세에만 있는 필드(주소·문의처·난방방식·잔금)를 채우는 것이 목적이라,
+ * 상세가 비워 보낸 필드는 목록에서 온 값을 그대로 둔다.
+ */
+fun Notice.mergeDetail(detail: Notice): Notice = copy(
+    statusName = detail.statusName ?: statusName,
+    supplyInstitutionName = detail.supplyInstitutionName ?: supplyInstitutionName,
+    houseTypeName = detail.houseTypeName ?: houseTypeName,
+    supplyTypeName = detail.supplyTypeName ?: supplyTypeName,
+    complexName = detail.complexName ?: complexName,
+    address = NoticeAddress(
+        provinceName = detail.address.provinceName ?: address.provinceName,
+        districtName = detail.address.districtName ?: address.districtName,
+        fullAddress = detail.address.fullAddress ?: address.fullAddress,
+        roadName = detail.address.roadName ?: address.roadName,
+        legalDongName = detail.address.legalDongName ?: address.legalDongName,
+        pnu = detail.address.pnu ?: address.pnu,
+    ),
+    price = NoticePrice(
+        minDeposit = detail.price.minDeposit ?: price.minDeposit,
+        minDownPayment = detail.price.minDownPayment ?: price.minDownPayment,
+        minInterimPayment = detail.price.minInterimPayment ?: price.minInterimPayment,
+        minBalance = detail.price.minBalance ?: price.minBalance,
+        minMonthlyRent = detail.price.minMonthlyRent ?: price.minMonthlyRent,
+    ),
+    heatingMethodName = detail.heatingMethodName ?: heatingMethodName,
+    supplyCount = detail.supplyCount ?: supplyCount,
+    contact = detail.contact ?: contact,
+    noticeUrl = detail.noticeUrl ?: noticeUrl,
+    pcUrl = detail.pcUrl ?: pcUrl,
 )

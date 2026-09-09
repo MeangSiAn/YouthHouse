@@ -8,116 +8,92 @@ import org.junit.Test
 
 class NoticeMapperTest {
 
-    /** API는 값 없음을 null이 아니라 빈 문자열로 준다. */
+    /**
+     * 도메인은 날짜를 사전순으로 비교해 기간을 판정하고 `daysBetween`이 8자리를 전제한다.
+     * 하이픈이 남으면 D-day가 통째로 어긋난다.
+     */
     @Test
-    fun `빈 문자열은 null로 정규화된다`() {
+    fun `날짜에서 하이픈을 지워 YYYYMMDD로 만든다`() {
         val notice = NoticeItemDto(
-            pblancId = "1",
-            pblancNm = "제목",
-            hsmpNm = "",
-            fullAdres = "",
-            beforePblancId = "",
-            heatMthdNm = "",
-        ).toDomain(NoticeCategory.RENTAL)
+            applyStart = "2026-08-31",
+            applyEnd = "2026-09-04",
+            announceDate = "2026-08-19",
+            winnerDate = "2026-12-03",
+        ).toDomain()
 
-        assertNull(notice.complexName)
-        assertNull(notice.address.fullAddress)
-        assertNull(notice.previousNoticeId)
-        assertNull(notice.heatingMethodName)
+        assertEquals("20260831", notice.period.beginDate)
+        assertEquals("20260904", notice.period.endDate)
+        assertEquals("20260819", notice.period.noticeDate)
+        assertEquals("20261203", notice.period.winnerAnnounceDate)
     }
 
-    /** 금액·세대수의 값 없음은 0으로 온다. 0원과 미기재를 구분할 방법이 없어 null로 본다. */
     @Test
-    fun `0인 금액과 세대수는 null로 정규화된다`() {
-        val notice = NoticeItemDto(rentGtn = 0, mtRntchrg = 0, totHshldCo = 0, sumSuplyCo = 0)
-            .toDomain(NoticeCategory.RENTAL)
+    fun `분야는 한글 이름으로 온다`() {
+        assertEquals(NoticeCategory.SALE, NoticeItemDto(category = "공공분양").toDomain().category)
+        assertEquals(NoticeCategory.RENTAL, NoticeItemDto(category = "공공임대").toDomain().category)
+    }
+
+    /** 서버가 분야 이름을 바꾸더라도 목록이 통째로 죽지 않아야 한다. */
+    @Test
+    fun `모르는 분야는 임대로 접는다`() {
+        assertEquals(NoticeCategory.RENTAL, NoticeItemDto(category = "신설분야").toDomain().category)
+    }
+
+    @Test
+    fun `빈 문자열과 누락 필드는 null로 정규화된다`() {
+        val notice = NoticeItemDto(complexName = "", heatType = null, contact = "  ").toDomain()
+
+        assertNull(notice.complexName)
+        assertNull(notice.heatingMethodName)
+        assertNull(notice.contact)
+        assertNull(notice.address.fullAddress)
+    }
+
+    /** 0원과 미기재를 구분할 방법이 없어 0을 값 없음으로 본다. */
+    @Test
+    fun `0인 금액과 호수는 null로 정규화된다`() {
+        val notice = NoticeItemDto(deposit = 0, monthlyRent = 0, totalUnits = 0).toDomain()
 
         assertNull(notice.price.minDeposit)
         assertNull(notice.price.minMonthlyRent)
-        assertNull(notice.totalHouseholdCount)
         assertNull(notice.supplyCount)
     }
 
     @Test
-    fun `값이 있는 필드는 그대로 매핑된다`() {
+    fun `금액과 공급 호수를 그대로 옮긴다`() {
         val notice = NoticeItemDto(
-            pblancId = "20955",
-            houseSn = 2,
-            pblancNm = "매입임대 모집공고",
-            sttusNm = "일반공고",
-            brtcNm = "울산광역시",
-            signguNm = "중구",
-            rentGtn = 12_000_000,
-            sumSuplyCo = 3,
-            beginDe = "20260810",
-            endDe = "20260811",
-        ).toDomain(NoticeCategory.RENTAL)
+            deposit = 2_778_000,
+            monthlyRent = 55_360,
+            balance = 2_639_100,
+            totalUnits = 5,
+        ).toDomain()
 
-        assertEquals("20955", notice.pblancId)
-        assertEquals(2, notice.houseSn)
-        assertEquals("매입임대 모집공고", notice.title)
-        assertEquals("일반공고", notice.statusName)
-        assertEquals("울산광역시", notice.address.provinceName)
-        assertEquals("중구", notice.address.districtName)
-        assertEquals(12_000_000, notice.price.minDeposit)
-        assertEquals(3, notice.supplyCount)
+        assertEquals(2_778_000, notice.price.minDeposit)
+        assertEquals(55_360, notice.price.minMonthlyRent)
+        assertEquals(2_639_100, notice.price.minBalance)
+        assertEquals(5, notice.supplyCount)
     }
 
+    /**
+     * 두 URL의 역할이 갈린다 — 신청 버튼은 접수처로, "공고 상세 보기"는 마이홈 원문으로 간다.
+     * 이 대응이 뒤집히면 사용자가 신청 버튼을 눌렀는데 안내문이 열린다.
+     */
     @Test
-    fun `원문 링크는 모바일 PC 원공고 순으로 고른다`() {
-        val mobileFirst = NoticeItemDto(
-            url = "https://apply.lh.or.kr/x",
-            pcUrl = "https://www.myhome.go.kr/x",
-            mobileUrl = "https://m.myhome.go.kr/x",
-        ).toDomain(NoticeCategory.RENTAL)
-        assertEquals("https://m.myhome.go.kr/x", mobileFirst.preferredUrl)
-
-        val pcFallback = NoticeItemDto(
-            url = "https://apply.lh.or.kr/x",
-            pcUrl = "https://www.myhome.go.kr/x",
-            mobileUrl = "",
-        ).toDomain(NoticeCategory.RENTAL)
-        assertEquals("https://www.myhome.go.kr/x", pcFallback.preferredUrl)
-
-        val noticeFallback = NoticeItemDto(url = "https://apply.lh.or.kr/x").toDomain(NoticeCategory.RENTAL)
-        assertEquals("https://apply.lh.or.kr/x", noticeFallback.preferredUrl)
-    }
-
-    /** 분양은 보증금·월세·공급유형이 응답에 없어 전부 null이어야 한다. */
-    @Test
-    fun `분양은 임대 전용 필드가 null이고 분야가 SALE이다`() {
+    fun `접수처와 원문 링크가 갈린다`() {
         val notice = NoticeItemDto(
-            pblancId = "1462",
-            pblancNm = "성남복정2 신혼희망타운(공공분양)",
-            houseTyNm = "아파트",
-            enty = 43_287_000,
-            surlus = 304_680_000,
-        ).toDomain(NoticeCategory.SALE)
+            applyUrl = "https://apply.lh.or.kr/x",
+            detailUrl = "https://www.myhome.go.kr/y",
+        ).toDomain()
 
-        assertEquals(NoticeCategory.SALE, notice.category)
-        assertNull(notice.supplyTypeName)
-        assertNull(notice.price.minDeposit)
-        assertNull(notice.price.minMonthlyRent)
-        assertNull(notice.totalHouseholdCount)
-        assertEquals(43_287_000, notice.price.minDownPayment)
-        assertEquals(304_680_000, notice.price.minBalance)
-    }
-
-    /** YYYYMMDD는 사전순 비교가 곧 시간순 비교라 문자열만으로 기간 판정이 된다. */
-    @Test
-    fun `모집 기간 판정은 경계값을 포함한다`() {
-        val notice = NoticeItemDto(beginDe = "20260810", endDe = "20260811").toDomain(NoticeCategory.RENTAL)
-
-        assertEquals(false, notice.isOpenOn("20260809"))
-        assertEquals(true, notice.isOpenOn("20260810"))
-        assertEquals(true, notice.isOpenOn("20260811"))
-        assertEquals(false, notice.isOpenOn("20260812"))
+        assertEquals("https://apply.lh.or.kr/x", notice.noticeUrl)
+        assertEquals("https://www.myhome.go.kr/y", notice.preferredUrl)
     }
 
     @Test
-    fun `모집 기간이 비어 있으면 모집중이 아니다`() {
-        val notice = NoticeItemDto(beginDe = "", endDe = "").toDomain(NoticeCategory.RENTAL)
+    fun `지역은 시도와 시군구로 나뉘어 담긴다`() {
+        val notice = NoticeItemDto(sido = "경기도", sigungu = "평택시").toDomain()
 
-        assertEquals(false, notice.isOpenOn("20260810"))
+        assertEquals("경기도", notice.address.provinceName)
+        assertEquals("평택시", notice.address.districtName)
     }
 }

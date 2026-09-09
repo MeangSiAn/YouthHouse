@@ -2,15 +2,13 @@ package com.ams.youthhouse.core.notice.data.paging
 
 import androidx.paging.PagingSource
 import com.ams.youthhouse.core.common.error.AppException
-import com.ams.youthhouse.core.notice.data.api.NoticeApi
+import com.ams.youthhouse.core.notice.data.api.MosstisNoticeApi
 import com.ams.youthhouse.core.notice.data.datasource.NoticeRemoteDataSource
-import com.ams.youthhouse.core.notice.data.dto.NoticeBodyDto
-import com.ams.youthhouse.core.notice.data.dto.NoticeHeaderDto
 import com.ams.youthhouse.core.notice.data.dto.NoticeItemDto
 import com.ams.youthhouse.core.notice.data.dto.NoticeListResponseDto
-import com.ams.youthhouse.core.notice.data.dto.NoticeResponseDto
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory
 import com.ams.youthhouse.core.notice.domain.model.NoticeRegion
+import com.ams.youthhouse.core.notice.domain.model.NoticeStatusFilter
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -25,129 +23,106 @@ import java.io.IOException
 class NoticePagingSourceTest {
 
     @Test
-    fun `첫 페이지를 로드하면 prevKey는 null이고 nextKey는 2다`() = runTest {
-        val pagingSource = pagingSource(FakeNoticeApi(totalCount = 100))
+    fun `첫 페이지의 prevKey는 null이고 nextKey는 다음 offset이다`() = runTest {
+        val pagingSource = pagingSource(FakeNoticeApi(total = 100))
 
         val result = pagingSource.load(refreshParams()) as PagingSource.LoadResult.Page
 
         assertEquals(NoticePagingSource.PAGE_SIZE, result.data.size)
         assertNull(result.prevKey)
-        assertEquals(2, result.nextKey)
+        assertEquals(NoticePagingSource.PAGE_SIZE, result.nextKey)
     }
 
-    /** 마지막 페이지 판정은 totalCount 기준이다. */
+    /** 마지막 페이지 판정은 total 기준이다. */
     @Test
     fun `마지막 페이지에서 nextKey는 null이다`() = runTest {
-        val pagingSource = pagingSource(FakeNoticeApi(totalCount = 40))
+        val pagingSource = pagingSource(FakeNoticeApi(total = 40))
 
-        val result = pagingSource.load(appendParams(pageNo = 2)) as PagingSource.LoadResult.Page
+        val result = pagingSource.load(appendParams(offset = 20)) as PagingSource.LoadResult.Page
 
-        assertEquals(1, result.prevKey)
+        assertEquals(0, result.prevKey)
         assertNull(result.nextKey)
     }
 
     @Test
-    fun `item이 비면 nextKey는 null이다`() = runTest {
-        val pagingSource = pagingSource(FakeNoticeApi(totalCount = 1000, itemCount = 0))
+    fun `결과가 비면 nextKey는 null이다`() = runTest {
+        val pagingSource = pagingSource(FakeNoticeApi(total = 1000, itemCount = 0))
 
-        val result = pagingSource.load(appendParams(pageNo = 5)) as PagingSource.LoadResult.Page
+        val result = pagingSource.load(appendParams(offset = 100)) as PagingSource.LoadResult.Page
 
         assertTrue(result.data.isEmpty())
         assertNull(result.nextKey)
     }
 
-    /** 데이터 없음(03)은 오류가 아니라 정상 종료다. Error로 만들면 화면에 에러 UI가 뜬다. */
+    /** 서버에 보내는 건 페이지 번호가 아니라 offset이다. 어긋나면 항목이 겹치거나 건너뛴다. */
     @Test
-    fun `resultCode 03이면 빈 페이지와 nextKey null을 반환한다`() = runTest {
-        val pagingSource = pagingSource(FakeNoticeApi(resultCode = "03", body = null))
+    fun `요청 offset이 그대로 서버로 나간다`() = runTest {
+        val api = FakeNoticeApi(total = 100)
+        val pagingSource = pagingSource(api)
 
-        val result = pagingSource.load(refreshParams()) as PagingSource.LoadResult.Page
+        pagingSource.load(appendParams(offset = 40))
 
-        assertTrue(result.data.isEmpty())
-        assertNull(result.nextKey)
+        assertEquals(40, api.lastOffset)
+        assertEquals(NoticePagingSource.PAGE_SIZE, api.lastLimit)
     }
 
     @Test
-    fun `resultCode 99면 Server 오류를 반환한다`() = runTest {
+    fun `필터는 서버 쿼리로 나간다`() = runTest {
+        val api = FakeNoticeApi(total = 10)
         val pagingSource = pagingSource(
-            FakeNoticeApi(resultCode = "99", resultMsg = "기타 에러", body = null),
+            api = api,
+            category = NoticeCategory.SALE,
+            region = NoticeRegion.GYEONGGI,
+            status = NoticeStatusFilter.UPCOMING,
         )
-
-        val result = pagingSource.load(refreshParams()) as PagingSource.LoadResult.Error
-        val error = result.throwable as AppException.Server
-
-        assertEquals("99", error.code)
-        assertEquals("기타 에러", error.serverMessage)
-    }
-
-    /** 인증키 오류는 HTTP 403 + XML 본문으로 오므로 HTTP 레벨에서 잡혀야 한다. */
-    @Test
-    fun `HTTP 403은 Unauthorized로 변환된다`() = runTest {
-        val pagingSource = pagingSource(
-            FakeNoticeApi(
-                throwable = HttpException(
-                    Response.error<Unit>(
-                        403,
-                        "<OpenAPI_ServiceResponse><cmmMsgHeader><errMsg>SERVICE_KEY_IS_NOT_REGISTERED_ERROR</errMsg></cmmMsgHeader></OpenAPI_ServiceResponse>"
-                            .toResponseBody("application/xml".toMediaType()),
-                    ),
-                ),
-            ),
-        )
-
-        val result = pagingSource.load(refreshParams()) as PagingSource.LoadResult.Error
-        val error = result.throwable as AppException.Unauthorized
-
-        assertEquals(403, error.httpCode)
-    }
-
-    @Test
-    fun `IOException은 Network 오류로 변환된다`() = runTest {
-        val pagingSource = pagingSource(FakeNoticeApi(throwable = IOException("offline")))
-
-        val result = pagingSource.load(refreshParams()) as PagingSource.LoadResult.Error
-
-        assertTrue(result.throwable is AppException.Network)
-    }
-
-    @Test
-    fun `지역 필터가 brtcCode로 전달된다`() = runTest {
-        val api = FakeNoticeApi()
-        val pagingSource = pagingSource(api, brtcCode = NoticeRegion.GYEONGGI.code)
 
         pagingSource.load(refreshParams())
 
-        assertEquals("41", api.lastBrtcCode)
+        assertEquals("공공분양", api.lastCategory)
+        assertEquals("경기도", api.lastSido)
+        assertEquals("upcoming", api.lastStatus)
     }
 
-    /** 전체 조회일 때 brtcCode를 붙이면 안 된다 (OkHttp가 null 파라미터를 생략한다). */
+    /** 전체 지역은 파라미터를 아예 보내지 않는다. */
     @Test
-    fun `지역이 없으면 brtcCode를 보내지 않는다`() = runTest {
-        val api = FakeNoticeApi()
-        val pagingSource = pagingSource(api, brtcCode = null)
+    fun `지역이 없으면 sido를 보내지 않는다`() = runTest {
+        val api = FakeNoticeApi(total = 10)
 
-        pagingSource.load(refreshParams())
+        pagingSource(api, region = null).load(refreshParams())
 
-        assertNull(api.lastBrtcCode)
+        assertNull(api.lastSido)
     }
 
-    /** 응답 언랩은 NoticeRemoteDataSource가 하므로 fake api를 그걸로 감싼다. */
+    @Test
+    fun `네트워크 오류는 Error로 돌아온다`() = runTest {
+        val pagingSource = pagingSource(FakeNoticeApi(error = IOException("offline")))
+
+        val result = pagingSource.load(refreshParams())
+
+        assertTrue(result is PagingSource.LoadResult.Error)
+        assertTrue((result as PagingSource.LoadResult.Error).throwable is AppException.Network)
+    }
+
+    /** 백엔드 인증 실패(401)는 화면 문구가 갈리도록 도메인 예외로 정규화돼야 한다. */
+    @Test
+    fun `인증 실패는 Unauthorized로 정규화된다`() = runTest {
+        val unauthorized = HttpException(
+            Response.error<Unit>(401, "".toResponseBody("application/json".toMediaType())),
+        )
+        val pagingSource = pagingSource(FakeNoticeApi(error = unauthorized))
+
+        val result = pagingSource.load(refreshParams())
+
+        val throwable = (result as PagingSource.LoadResult.Error).throwable
+        assertTrue(throwable is AppException.Unauthorized)
+    }
+
     private fun pagingSource(
         api: FakeNoticeApi,
         category: NoticeCategory = NoticeCategory.RENTAL,
-        brtcCode: String? = null,
-    ) = NoticePagingSource(NoticeRemoteDataSource(api), category, brtcCode)
-
-    @Test
-    fun `분야에 따라 다른 엔드포인트를 호출한다`() = runTest {
-        val rentalApi = FakeNoticeApi()
-        pagingSource(rentalApi, category = NoticeCategory.RENTAL).load(refreshParams())
-        assertEquals(NoticeCategory.RENTAL, rentalApi.lastCategory)
-
-        val saleApi = FakeNoticeApi()
-        pagingSource(saleApi, category = NoticeCategory.SALE).load(refreshParams())
-        assertEquals(NoticeCategory.SALE, saleApi.lastCategory)
-    }
+        region: NoticeRegion? = null,
+        status: NoticeStatusFilter = NoticeStatusFilter.ALL,
+    ) = NoticePagingSource(NoticeRemoteDataSource(api), category, region, status)
 
     private fun refreshParams() = PagingSource.LoadParams.Refresh<Int>(
         key = null,
@@ -155,65 +130,51 @@ class NoticePagingSourceTest {
         placeholdersEnabled = false,
     )
 
-    private fun appendParams(pageNo: Int) = PagingSource.LoadParams.Append(
-        key = pageNo,
+    private fun appendParams(offset: Int) = PagingSource.LoadParams.Append(
+        key = offset,
         loadSize = NoticePagingSource.PAGE_SIZE,
         placeholdersEnabled = false,
     )
 }
 
-/**
- * 손으로 쓴 fake. 목킹 라이브러리를 들이지 않는다 —
- * 인터페이스가 메서드 하나뿐이라 fake가 더 짧고 의도가 분명하다.
- */
 private class FakeNoticeApi(
-    private val totalCount: Int = 100,
+    private val total: Int = 0,
     private val itemCount: Int = NoticePagingSource.PAGE_SIZE,
-    private val resultCode: String = "00",
-    private val resultMsg: String = "NORMAL SERVICE",
-    private val body: NoticeBodyDto? = NoticeBodyDto(),
-    private val throwable: Throwable? = null,
-) : NoticeApi {
+    private val error: Throwable? = null,
+) : MosstisNoticeApi {
 
-    /** 마지막 호출에 실린 brtcCode. 필터가 실제로 전달되는지 검증하는 용도. */
-    var lastBrtcCode: String? = null
-        private set
+    var lastCategory: String? = null
+    var lastSido: String? = null
+    var lastStatus: String? = null
+    var lastLimit: Int? = null
+    var lastOffset: Int? = null
 
-    /** 마지막으로 호출된 오퍼레이션. 분야에 따라 엔드포인트가 갈리는지 검증한다. */
-    var lastCategory: NoticeCategory? = null
-        private set
-
-    override suspend fun getRentalNoticeList(pageNo: Int, numOfRows: Int, brtcCode: String?) =
-        respond(NoticeCategory.RENTAL, pageNo, numOfRows, brtcCode)
-
-    override suspend fun getSaleNoticeList(pageNo: Int, numOfRows: Int, brtcCode: String?) =
-        respond(NoticeCategory.SALE, pageNo, numOfRows, brtcCode)
-
-    private fun respond(
-        category: NoticeCategory,
-        pageNo: Int,
-        numOfRows: Int,
-        brtcCode: String?,
+    override suspend fun getNotices(
+        category: String,
+        sido: String?,
+        status: String,
+        limit: Int,
+        offset: Int,
     ): NoticeListResponseDto {
         lastCategory = category
-        lastBrtcCode = brtcCode
-        throwable?.let { throw it }
+        lastSido = sido
+        lastStatus = status
+        lastLimit = limit
+        lastOffset = offset
+        error?.let { throw it }
 
         return NoticeListResponseDto(
-            response = NoticeResponseDto(
-                header = NoticeHeaderDto(resultCode = resultCode, resultMsg = resultMsg),
-                body = body?.copy(
-                    totalCount = totalCount.toString(),
-                    numOfRows = numOfRows.toString(),
-                    pageNo = pageNo.toString(),
-                    item = List(itemCount) { index ->
-                        NoticeItemDto(
-                            pblancId = "${pageNo}_$index",
-                            pblancNm = "공고 $pageNo-$index",
-                        )
-                    },
-                ),
-            ),
+            total = total,
+            limit = limit,
+            offset = offset,
+            results = List(itemCount) { index ->
+                NoticeItemDto(noticeId = "id-${offset + index}", title = "공고 $index")
+            },
         )
+    }
+
+    override suspend fun getNotice(noticeId: String): NoticeItemDto {
+        error?.let { throw it }
+        return NoticeItemDto(noticeId = noticeId)
     }
 }

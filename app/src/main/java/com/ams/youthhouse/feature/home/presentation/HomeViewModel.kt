@@ -216,8 +216,11 @@ class HomeViewModel @Inject constructor(
     private companion object {
         const val TAG = "HomeViewModel"
 
-        /** 지역 단위 최대가 임대 76건 + 분양 27건이라 이 값이면 전 건을 덮는다. */
-        const val REGION_SNAPSHOT_MAX_COUNT = 500
+        /**
+         * 백엔드 `limit` 상한이 200이다. 지역을 지정하면 한 분야당 100건을 넘지 않아
+         * (실측 최대: 경기도 90건) 한 번의 호출로 전 건을 덮는다.
+         */
+        const val REGION_SNAPSHOT_MAX_COUNT = 200
         /**
          * 지역 미설정 화면의 맛보기 건수.
          *

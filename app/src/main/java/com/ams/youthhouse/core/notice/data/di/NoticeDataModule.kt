@@ -2,7 +2,8 @@ package com.ams.youthhouse.core.notice.data.di
 
 import android.content.Context
 import androidx.room.Room
-import com.ams.youthhouse.core.notice.data.api.NoticeApi
+import com.ams.youthhouse.core.network.di.MosstisApi
+import com.ams.youthhouse.core.notice.data.api.MosstisNoticeApi
 import com.ams.youthhouse.core.notice.data.local.FavoriteNoticeDao
 import com.ams.youthhouse.core.notice.data.local.NoticeDatabase
 import com.ams.youthhouse.core.notice.data.repository.FavoriteNoticeRepositoryImpl
@@ -26,7 +27,8 @@ object NoticeApiModule {
 
     @Provides
     @Singleton
-    fun provideNoticeApi(retrofit: Retrofit): NoticeApi = retrofit.create(NoticeApi::class.java)
+    fun provideNoticeApi(@MosstisApi retrofit: Retrofit): MosstisNoticeApi =
+        retrofit.create(MosstisNoticeApi::class.java)
 }
 
 @Module

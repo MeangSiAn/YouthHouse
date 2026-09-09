@@ -14,7 +14,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-/** 자체 백엔드(data.mosstis.com)로 가는 클라이언트를 data.go.kr 것과 구분한다. */
+/** 자체 백엔드(data.mosstis.com)로 가는 클라이언트. 인증 헤더가 붙는 쪽이다. */
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class MosstisApi
@@ -25,8 +25,11 @@ object MosstisNetworkModule {
 
     /**
      * 기존 클라이언트에서 파생시킨다(`newBuilder`) — 커넥션 풀·디스패처를 공유하고
-     * 인터셉터 구성만 갈린다. data.go.kr용 serviceKey 인터셉터는 호스트가 달라
-     * 붙어도 무해하지만, 남의 키를 다른 서버에 흘리지 않도록 비우고 다시 쌓는다.
+     * 인증 헤더만 얹는다.
+     *
+     * 예전에는 base 체인을 비우고 다시 쌓았다. data.go.kr용 serviceKey 인터셉터가
+     * 거기 있어 남의 키가 이 서버로 새어 나가지 않게 해야 했기 때문이다.
+     * 그 인터셉터가 사라진 지금은 base가 로깅만 갖고 있어 그대로 물려받으면 된다.
      */
     @MosstisApi
     @Provides
@@ -35,14 +38,7 @@ object MosstisNetworkModule {
         baseClient: OkHttpClient,
         apiKeyInterceptor: ApiKeyHeaderInterceptor,
     ): OkHttpClient = baseClient.newBuilder()
-        .apply { interceptors().clear() }
         .addInterceptor(apiKeyInterceptor)
-        .apply {
-            // 로깅 인터셉터는 debug에서만 base 체인에 존재한다. 있으면 되살린다.
-            baseClient.interceptors
-                .filterIsInstance<okhttp3.logging.HttpLoggingInterceptor>()
-                .forEach(::addInterceptor)
-        }
         .build()
 
     @MosstisApi

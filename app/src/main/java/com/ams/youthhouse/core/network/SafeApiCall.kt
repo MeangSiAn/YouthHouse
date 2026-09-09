@@ -11,10 +11,11 @@ import java.io.IOException
  *
  * suspend 함수가 `Response<T>`가 아닌 raw 타입을 반환할 때 Retrofit은
  * 비-2xx 응답에서 **컨버터를 태우지 않고** 곧바로 [HttpException]을 던진다.
- * 덕분에 data.go.kr의 인증 실패(HTTP 403 + XML 본문)가 JSON 역직렬화에 도달하지 않고
+ * 덕분에 인증 실패(401)의 응답 본문이 JSON 역직렬화에 도달하지 않고
  * [AppException.Unauthorized]로 흡수된다.
  *
- * [SerializationException] 분기는 방어선이다 — HTTP 200으로 XML 오류를 돌려주는 경우가 있다.
+ * [SerializationException] 분기는 방어선이다 — 게이트웨이가 HTTP 200으로
+ * JSON이 아닌 본문을 돌려주는 경우가 있다.
  */
 suspend fun <T> safeApiCall(block: suspend () -> T): T = try {
     block()

@@ -8,6 +8,7 @@ import com.ams.youthhouse.core.notice.data.paging.NoticePagingSource
 import com.ams.youthhouse.core.notice.domain.model.Notice
 import com.ams.youthhouse.core.notice.domain.model.NoticeCategory
 import com.ams.youthhouse.core.notice.domain.model.NoticeRegion
+import com.ams.youthhouse.core.notice.domain.model.NoticeStatusFilter
 import com.ams.youthhouse.core.notice.domain.repository.NoticeRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -21,14 +22,17 @@ class NoticeRepositoryImpl @Inject constructor(
     override fun getNotices(
         category: NoticeCategory,
         region: NoticeRegion?,
+        status: NoticeStatusFilter,
     ): Flow<PagingData<Notice>> = Pager(
         config = PagingConfig(
             pageSize = NoticePagingSource.PAGE_SIZE,
-            // 기본값(pageSize * 3)을 쓰면 페이지 번호 기반 API에서 항목이 중복 로드된다.
+            // 기본값(pageSize * 3)을 쓰면 첫 로드와 다음 페이지의 offset이 어긋나 항목이 겹친다.
             initialLoadSize = NoticePagingSource.PAGE_SIZE,
             enablePlaceholders = false,
         ),
-        pagingSourceFactory = { NoticePagingSource(remoteDataSource, category, region?.code) },
+        pagingSourceFactory = {
+            NoticePagingSource(remoteDataSource, category, region, status)
+        },
     ).flow
 
     override suspend fun getNoticeSnapshot(
@@ -38,12 +42,20 @@ class NoticeRepositoryImpl @Inject constructor(
     ): List<Notice> =
         remoteDataSource.fetchNotices(
             category = category,
-            pageNo = FIRST_PAGE,
-            numOfRows = maxCount,
-            brtcCode = region?.code,
+            region = region,
+            // 홈은 접수중·예정·오늘 마감을 함께 세므로 상태로 거르지 않는다.
+            status = NoticeStatusFilter.ALL,
+            limit = maxCount.coerceAtMost(MAX_PAGE_LIMIT),
+            offset = FIRST_OFFSET,
         ).notices
 
+    override suspend fun getNotice(noticeId: String): Notice =
+        remoteDataSource.fetchNotice(noticeId)
+
     private companion object {
-        const val FIRST_PAGE = 1
+        const val FIRST_OFFSET = 0
+
+        /** 서버가 정한 `limit` 상한. 넘겨 보내면 422로 거절당한다. */
+        const val MAX_PAGE_LIMIT = 200
     }
 }

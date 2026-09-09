@@ -34,12 +34,12 @@ class FavoriteNoticeRepositoryImpl @Inject constructor(
         }
 
     // 저장된 키 문자열을 파싱하지 않고 스냅숏에서 다시 계산한다.
-    // 키 구성이 바뀌어도(이번처럼) 옛 데이터와 어긋날 일이 없다.
+    // 키 구성이 바뀌어도 옛 데이터와 어긋날 일이 없다.
     override val favoriteKeys: Flow<Set<FavoriteNoticeKey>> =
         favorites.map { notices -> notices.map { it.toFavoriteKey() }.toSet() }
 
     override suspend fun toggle(notice: Notice) {
-        val key = notice.toFavoriteKey().asStorageKey()
+        val key = notice.toFavoriteKey().noticeId
         if (dao.exists(key)) {
             dao.deleteByKey(key)
         } else {
@@ -55,12 +55,3 @@ class FavoriteNoticeRepositoryImpl @Inject constructor(
         }
     }
 }
-
-/**
- * DB 기본키로 쓸 불투명 문자열. **다시 파싱하지 않는다** — 같은 행인지 판별하는 용도뿐이다.
- * 지역·단지명에 구분자가 들어가는 병적인 경우까지 안전할 필요는 없고,
- * 만에 하나 충돌해도 "화면상 구분 안 되는 두 행이 함께 찜되는" 정도라 해가 없다.
- */
-private fun FavoriteNoticeKey.asStorageKey(): String =
-    listOf(category.name, pblancId, houseSn.toString(), districtName, complexName)
-        .joinToString(separator = "|")
