@@ -64,7 +64,9 @@ import com.ams.youthhouse.core.complex.domain.model.DefectStatus
 import com.ams.youthhouse.core.complex.domain.model.ElevatorCondition
 import com.ams.youthhouse.core.complex.domain.model.VisitCriterion
 import com.ams.youthhouse.core.complex.domain.model.VisitRatings
-import com.ams.youthhouse.feature.trade.presentation.component.labelRes
+import com.ams.youthhouse.core.common.format.formatManwonAsEokMan
+import com.ams.youthhouse.core.complex.presentation.component.labelRes
+import com.ams.youthhouse.feature.trade.presentation.component.formatArea
 
 /**
  * 기획서 dev2.0 SCREEN 09 — 임장노트.
@@ -244,7 +246,43 @@ private fun NoteForm(
             )
         }
 
+        // 노트를 쓸 때 보고 있던 평형의 최근 실거래. 고칠 수 없는 값이라 읽기 전용으로만 보인다.
+        uiState.snapshot.referenceAmount?.let { amount ->
+            ReadOnlyField(
+                label = stringResource(R.string.note_reference_deal),
+                value = listOfNotNull(
+                    uiState.snapshot.referenceArea?.formatArea(),
+                    amount.formatManwonAsEokMan(),
+                ).joinToString(separator = " · "),
+            )
+        }
+
         FootnoteText(text = stringResource(R.string.note_footnote))
+    }
+}
+
+@Composable
+private fun ReadOnlyField(label: String, value: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                BorderStroke(AppSize.border, AppTheme.semanticColors.line),
+                RoundedCornerShape(AppRadius.card),
+            )
+            .padding(horizontal = AppSpacing.lg, vertical = AppSpacing.lg),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.xxs),
+    ) {
+        Text(
+            text = label,
+            style = AppTextStyles.monoCaption,
+            color = AppTheme.semanticColors.ink45,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleSmall,
+            color = AppTheme.semanticColors.ink,
+        )
     }
 }
 

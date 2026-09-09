@@ -29,6 +29,8 @@
     <string name="note_criterion_noise">소음</string>
     <string name="note_criterion_parking">주차</string>
     <string name="note_criterion_management">단지 관리</string>
+    <string name="note_criterion_management_short">관리</string>
+    <string name="note_reference_short">방문 당시 %1$s</string>
     <string name="note_score_short">%1$s %2$d</string>
     <string name="note_overall">종합</string>
     <string name="note_walk_to_station">역까지 도보</string>
@@ -221,7 +223,8 @@
     <string name="home_visit_planned">임장 예정</string>
     <string name="home_visit_planned_date">%1$s 방문 예정</string>
     <string name="home_visit_done_summary">%1$s 방문 · 점검 %2$d/%3$d</string>
-    <string name="home_visit_incomplete">기록 미완 · 기억이 사라지기 전에 마저 채우기</string>
+    <string name="home_visit_incomplete">기록 미완 · 마저 채우기</string>
+    <string name="home_visit_more">더 보기</string>
     <string name="home_visit_empty_title">아직 기록한 임장이 없습니다</string>
     <string name="home_visit_empty_description">집을 보러 가기 전에 단지를 찾아 두면\n현장에서 점검 항목을 빠뜨리지 않고 볼 수 있습니다.</string>
     <string name="home_visit_empty_action">매매 탭에서 단지 찾기</string>

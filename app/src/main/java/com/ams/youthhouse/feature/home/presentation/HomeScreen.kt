@@ -37,12 +37,11 @@ import com.ams.youthhouse.core.notice.presentation.model.NoticeUiModel
 import com.ams.youthhouse.core.notice.presentation.model.previewNoticeUiModel
 import com.ams.youthhouse.feature.home.presentation.component.GuideRail
 import com.ams.youthhouse.feature.home.presentation.component.NoOpenNoticeGuide
-import com.ams.youthhouse.feature.home.presentation.component.PlannedVisitCard
 import com.ams.youthhouse.feature.home.presentation.component.RegionStatusBar
 import com.ams.youthhouse.feature.home.presentation.component.RegionUnsetBanner
 import com.ams.youthhouse.feature.home.presentation.component.UrgentDeadlineCard
 import com.ams.youthhouse.feature.home.presentation.component.VisitEmptyBlock
-import com.ams.youthhouse.feature.home.presentation.component.VisitRowGroup
+import com.ams.youthhouse.feature.home.presentation.component.VisitRail
 import com.ams.youthhouse.feature.home.presentation.guide.HomeGuide
 import com.ams.youthhouse.feature.home.presentation.model.HomeSummaryUiModel
 import com.ams.youthhouse.feature.home.presentation.model.HomeVisitUiModel
@@ -106,7 +105,7 @@ private fun LazyListScope.homeContent(
 /**
  * 임장기록 블록 — 내가 쌓아가는 것들. 공고 블록과 성격이 반대라 [BlockLabel]로 경계를 긋는다.
  *
- * 기획서 H-06: 예정은 카드, 다녀온 곳은 행. 둘 이상이면 비교 진입점을 단다.
+ * 기획서 v6: 최근 임장은 가로 슬라이드 카드. 둘 이상이면 비교 진입점을 단다.
  * 기록이 없으면 빈 카드로 두 번째 쓸모를 알린다(SCREEN 02) — 공고가 0건인 달에도
  * 홈에 남는 내 데이터가 이 블록이다.
  */
@@ -136,20 +135,14 @@ private fun LazyListScope.visitBlock(
         )
     }
 
-    val (planned, done) = uiState.visits.partition { it.isPlanned }
-    items(planned, key = { "planned-${it.kaptCode}" }) { visit ->
-        PlannedVisitCard(
-            visit = visit,
-            onClick = { onAction(HomeContract.Action.VisitClicked(visit)) },
+    item {
+        VisitRail(
+            visits = uiState.visits,
+            // 상한 밖의 기록이 있을 때만 "더 보기" 카드를 붙인다.
+            showMore = uiState.visitCount > uiState.visits.size,
+            onVisitClick = { visit -> onAction(HomeContract.Action.VisitClicked(visit)) },
+            onMoreClick = { onAction(HomeContract.Action.SeeAllComplexesClicked) },
         )
-    }
-    if (done.isNotEmpty()) {
-        item {
-            VisitRowGroup(
-                visits = done,
-                onVisitClick = { visit -> onAction(HomeContract.Action.VisitClicked(visit)) },
-            )
-        }
     }
 
     if (uiState.canCompareVisits) {
@@ -458,7 +451,8 @@ private fun previewState() = HomeContract.State(
             visitedOnLabel = "09.12",
             isPlanned = true,
             isIncomplete = false,
-            stars = null,
+            lightScore = null,
+            parkingScore = null,
             ratedCount = 0,
             totalCriteria = 4,
             viewedUnit = "84㎡ · 12층 · 남향",
@@ -470,7 +464,8 @@ private fun previewState() = HomeContract.State(
             visitedOnLabel = "07.27",
             isPlanned = false,
             isIncomplete = false,
-            stars = 4,
+            lightScore = 4,
+            parkingScore = 2,
             ratedCount = 4,
             totalCriteria = 4,
             viewedUnit = "",

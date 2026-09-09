@@ -1,14 +1,15 @@
 package com.ams.youthhouse.feature.trade.presentation.compare
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,14 +18,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +48,15 @@ import com.ams.youthhouse.R
 import com.ams.youthhouse.core.common.format.formatManwonAsEokMan
 import com.ams.youthhouse.core.common.format.formatThousands
 import com.ams.youthhouse.core.common.format.formatYearMonthDay
+import com.ams.youthhouse.core.complex.domain.VisitComparison
+import com.ams.youthhouse.core.complex.domain.model.ComplexSnapshot
+import com.ams.youthhouse.core.complex.domain.model.DefectStatus
+import com.ams.youthhouse.core.complex.domain.model.ElevatorCondition
+import com.ams.youthhouse.core.complex.domain.model.SiteVisitNote
+import com.ams.youthhouse.core.complex.domain.model.VisitCriterion
+import com.ams.youthhouse.core.complex.domain.model.VisitRatings
+import com.ams.youthhouse.core.complex.presentation.component.RatingDots
+import com.ams.youthhouse.core.complex.presentation.component.labelRes
 import com.ams.youthhouse.core.designsystem.component.EmptyContent
 import com.ams.youthhouse.core.designsystem.component.FootnoteText
 import com.ams.youthhouse.core.designsystem.component.SectionHeader
@@ -54,23 +65,16 @@ import com.ams.youthhouse.core.designsystem.theme.AppSize
 import com.ams.youthhouse.core.designsystem.theme.AppSpacing
 import com.ams.youthhouse.core.designsystem.theme.AppTextStyles
 import com.ams.youthhouse.core.designsystem.theme.AppTheme
-import com.ams.youthhouse.core.complex.domain.VisitComparison
-import com.ams.youthhouse.core.complex.domain.model.ComplexSnapshot
-import com.ams.youthhouse.core.complex.domain.model.DefectStatus
-import com.ams.youthhouse.core.complex.domain.model.ElevatorCondition
-import com.ams.youthhouse.core.complex.domain.model.SiteVisitNote
-import com.ams.youthhouse.core.complex.domain.model.VisitCriterion
-import com.ams.youthhouse.core.complex.domain.model.VisitRatings
-import com.ams.youthhouse.feature.trade.presentation.component.RatingDots
 import com.ams.youthhouse.feature.trade.presentation.component.formatArea
-import com.ams.youthhouse.feature.trade.presentation.component.labelRes
 import java.util.Locale
 
 /**
  * 임장 단지 비교.
  *
- * 열이 단지, 행이 항목인 표다. 각 행에서 가장 나은 단지를 강조하되, 그 판단은
- * 도메인([VisitComparison])이 하고 화면은 색만 입힌다.
+ * 선택과 표가 한 화면이다 — 2~3곳 고르는 일에 화면 전환은 과하다. 표는 열이 단지,
+ * 행이 항목이고, 어느 열이 어느 단지인지 스크롤해도 잃지 않도록 머리글이 고정된다.
+ * 우세는 배경 틴트로만 알린다. 승자를 선언하지 않는다 — 판단은 도메인([VisitComparison]),
+ * 화면은 색만.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,19 +125,22 @@ fun VisitCompareScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CompareContent(
     uiState: VisitCompareContract.State,
     onAction: (VisitCompareContract.Action) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.lg),
-        verticalArrangement = Arrangement.spacedBy(AppSpacing.xxl),
+    val selected = uiState.selectedNotes
+    val comparison = uiState.comparison
+
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(horizontal = AppSpacing.xl, vertical = AppSpacing.lg),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
+        item {
             SectionHeader(
                 title = stringResource(R.string.compare_pick),
                 trailingText = stringResource(
@@ -141,65 +148,163 @@ private fun CompareContent(
                     VisitCompareContract.MAX_SELECTION,
                 ),
             )
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
-                verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
-            ) {
-                uiState.notes.forEach { note ->
-                    FilterChip(
-                        selected = note.kaptCode in uiState.selectedCodes,
-                        onClick = {
-                            onAction(VisitCompareContract.Action.SelectionToggled(note.kaptCode))
-                        },
-                        label = {
-                            Text(
-                                text = note.complexName,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        },
+        }
+        item {
+            PickList(
+                notes = uiState.notes,
+                selectedCodes = uiState.selectedCodes,
+                onToggle = { onAction(VisitCompareContract.Action.SelectionToggled(it)) },
+            )
+        }
+
+        if (!uiState.hasEnoughSelection) {
+            item {
+                Text(
+                    text = stringResource(R.string.compare_pick_hint, VisitCompareContract.MIN_NOTES),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AppTheme.semanticColors.ink45,
+                )
+            }
+        } else {
+            stickyHeader {
+                HeaderRow(
+                    notes = selected,
+                    onNoteClick = { note ->
+                        onAction(VisitCompareContract.Action.NoteClicked(note.kaptCode, note.complexName))
+                    },
+                )
+            }
+            item { CompareRows(notes = selected, comparison = comparison) }
+
+            // 메모는 표 아래 세로로. 칸에 욱여넣으면 세 줄 넘어가는 순간 못 읽는다.
+            val withMemo = selected.filter { it.memo.isNotBlank() }
+            if (withMemo.isNotEmpty()) {
+                item {
+                    SectionHeader(
+                        title = stringResource(R.string.note_section_memo),
+                        modifier = Modifier.padding(top = AppSpacing.md),
                     )
                 }
+                items(withMemo, key = { "memo-${it.kaptCode}" }) { note -> MemoBlock(note) }
             }
         }
 
-        if (uiState.hasEnoughSelection) {
-            CompareTable(
-                notes = uiState.selectedNotes,
-                comparison = uiState.comparison,
-                onNoteClick = { note ->
-                    onAction(VisitCompareContract.Action.NoteClicked(note.kaptCode, note.complexName))
-                },
-            )
-        } else {
-            Text(
-                text = stringResource(R.string.compare_pick_hint, VisitCompareContract.MIN_NOTES),
-                style = MaterialTheme.typography.bodySmall,
-                color = AppTheme.semanticColors.ink45,
-            )
-        }
+        item { FootnoteText(text = stringResource(R.string.compare_footnote)) }
+    }
+}
 
-        FootnoteText(text = stringResource(R.string.compare_footnote))
+// ── 선택 ─────────────────────────────────────────────────
+
+@Composable
+private fun PickList(
+    notes: List<SiteVisitNote>,
+    selectedCodes: List<String>,
+    onToggle: (String) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                BorderStroke(AppSize.border, AppTheme.semanticColors.line),
+                RoundedCornerShape(AppRadius.card),
+            ),
+    ) {
+        notes.forEachIndexed { index, note ->
+            PickRow(
+                note = note,
+                checked = note.kaptCode in selectedCodes,
+                onClick = { onToggle(note.kaptCode) },
+            )
+            if (index != notes.lastIndex) RowDivider()
+        }
     }
 }
 
 @Composable
-private fun CompareTable(
-    notes: List<SiteVisitNote>,
-    comparison: VisitComparison,
-    onNoteClick: (SiteVisitNote) -> Unit,
-) {
-    val shape = RoundedCornerShape(AppRadius.card)
-    Column(
+private fun PickRow(note: SiteVisitNote, checked: Boolean, onClick: () -> Unit) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .border(BorderStroke(AppSize.border, AppTheme.semanticColors.line), shape)
-            .clip(shape),
+            .clickable(onClick = onClick)
+            .padding(start = AppSpacing.xs, end = AppSpacing.lg),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        HeaderRow(notes = notes, onNoteClick = onNoteClick)
-        RowDivider()
+        Checkbox(checked = checked, onCheckedChange = { onClick() })
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = AppSpacing.md),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.xxs),
+        ) {
+            Text(
+                text = note.complexName,
+                style = MaterialTheme.typography.titleSmall,
+                color = AppTheme.semanticColors.ink,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = listOfNotNull(
+                    note.visitedOn.formatYearMonthDay(),
+                    note.viewedUnit.takeIf { it.isNotBlank() },
+                ).joinToString(separator = " · "),
+                style = AppTextStyles.monoCaption,
+                color = AppTheme.semanticColors.ink45,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
 
+// ── 표 ───────────────────────────────────────────────────
+
+/** 고정 머리글. 아래 표와 같은 열 폭이어야 스크롤 중에도 열이 맞는다. */
+@Composable
+private fun HeaderRow(notes: List<SiteVisitNote>, onNoteClick: (SiteVisitNote) -> Unit) {
+    Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = AppSpacing.md),
+            verticalAlignment = Alignment.Top,
+        ) {
+            Spacer(modifier = Modifier.width(LABEL_WIDTH))
+            notes.forEach { note ->
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNoteClick(note) }
+                        .padding(horizontal = AppSpacing.sm),
+                    verticalArrangement = Arrangement.spacedBy(AppSpacing.xxs),
+                ) {
+                    Text(
+                        text = note.complexName,
+                        style = MaterialTheme.typography.titleSmall,
+                        color = AppTheme.semanticColors.ink,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    if (note.viewedUnit.isNotBlank()) {
+                        Text(
+                            text = note.viewedUnit,
+                            style = AppTextStyles.monoCaption,
+                            color = AppTheme.semanticColors.ink45,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+            }
+        }
+        HorizontalDivider(thickness = AppSize.border, color = AppTheme.semanticColors.line)
+    }
+}
+
+@Composable
+private fun CompareRows(notes: List<SiteVisitNote>, comparison: VisitComparison) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         CompareRow(label = stringResource(R.string.note_visited_on), notes = notes) { note ->
             CellText(text = note.visitedOn.formatYearMonthDay().orEmpty())
         }
@@ -234,8 +339,7 @@ private fun CompareTable(
             CellText(
                 text = stringResource(note.elevatorCondition.labelRes()),
                 color = when (note.elevatorCondition) {
-                    ElevatorCondition.NONE, ElevatorCondition.CROWDED ->
-                        AppTheme.semanticColors.close
+                    ElevatorCondition.NONE, ElevatorCondition.CROWDED -> AppTheme.semanticColors.close
                     ElevatorCondition.COMFORTABLE -> AppTheme.semanticColors.ink
                     ElevatorCondition.UNCHECKED -> AppTheme.semanticColors.ink45
                 },
@@ -273,63 +377,16 @@ private fun CompareTable(
             )
         }
 
-        CompareRow(label = stringResource(R.string.complex_households), notes = notes) { note ->
+        CompareRow(
+            label = stringResource(R.string.complex_households),
+            notes = notes,
+            showDivider = false,
+        ) { note ->
             CellText(
                 text = note.snapshot.householdCount?.formatThousands()
                     ?.let { stringResource(R.string.notice_unit_household, it) }
                     ?: stringResource(R.string.compare_not_rated),
             )
-        }
-
-        CompareRow(
-            label = stringResource(R.string.note_section_memo),
-            notes = notes,
-            showDivider = false,
-        ) { note ->
-            CellText(
-                text = note.memo.ifBlank { stringResource(R.string.compare_not_rated) },
-                style = MaterialTheme.typography.bodySmall,
-                color = AppTheme.semanticColors.ink70,
-                maxLines = MEMO_MAX_LINES,
-            )
-        }
-    }
-}
-
-@Composable
-private fun HeaderRow(notes: List<SiteVisitNote>, onNoteClick: (SiteVisitNote) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = AppSpacing.md),
-        verticalAlignment = Alignment.Top,
-    ) {
-        Spacer(modifier = Modifier.width(LABEL_WIDTH))
-        notes.forEach { note ->
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable { onNoteClick(note) }
-                    .padding(horizontal = AppSpacing.sm),
-                verticalArrangement = Arrangement.spacedBy(AppSpacing.xxs),
-            ) {
-                Text(
-                    text = note.complexName,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = AppTheme.semanticColors.ink,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                if (note.regionLabel.isNotBlank()) {
-                    Text(
-                        text = note.regionLabel,
-                        style = AppTextStyles.monoCaption,
-                        color = AppTheme.semanticColors.ink45,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
         }
     }
 }
@@ -354,7 +411,7 @@ private fun CompareRow(
             color = AppTheme.semanticColors.ink45,
             modifier = Modifier
                 .width(LABEL_WIDTH)
-                .padding(horizontal = AppSpacing.md, vertical = AppSpacing.md),
+                .padding(end = AppSpacing.md, top = AppSpacing.md, bottom = AppSpacing.md),
         )
         notes.forEach { note ->
             Box(
@@ -378,7 +435,7 @@ private fun RowDivider() {
 private fun CellText(
     text: String,
     highlighted: Boolean = false,
-    style: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
+    style: TextStyle = MaterialTheme.typography.bodyMedium,
     color: Color = AppTheme.semanticColors.ink,
     maxLines: Int = 2,
 ) {
@@ -396,26 +453,25 @@ private fun CellText(
     )
 }
 
+/** 점만 둔다. 숫자를 곁들이면 세 열이 빽빽해져 오히려 안 읽힌다. 2점 이하는 점 자체가 붉다. */
 @Composable
 private fun RatingCell(score: Int?, highlighted: Boolean) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .highlight(highlighted)
             .padding(horizontal = AppSpacing.sm, vertical = AppSpacing.md),
-        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+        contentAlignment = Alignment.CenterStart,
     ) {
-        RatingDots(score = score)
-        Text(
-            text = score?.toString() ?: stringResource(R.string.compare_not_rated),
-            style = AppTextStyles.mono,
-            color = when {
-                highlighted -> MaterialTheme.colorScheme.primary
-                score == null -> AppTheme.semanticColors.ink45
-                else -> AppTheme.semanticColors.ink
-            },
-            fontWeight = if (highlighted) FontWeight.Bold else null,
-        )
+        if (score == null) {
+            Text(
+                text = stringResource(R.string.compare_not_rated),
+                style = AppTextStyles.mono,
+                color = AppTheme.semanticColors.ink45,
+            )
+        } else {
+            RatingDots(score = score)
+        }
     }
 }
 
@@ -427,17 +483,44 @@ private fun Modifier.highlight(enabled: Boolean): Modifier =
         this
     }
 
+// ── 메모 ─────────────────────────────────────────────────
+
+@Composable
+private fun MemoBlock(note: SiteVisitNote) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                BorderStroke(AppSize.border, AppTheme.semanticColors.line),
+                RoundedCornerShape(AppRadius.card),
+            )
+            .clip(RoundedCornerShape(AppRadius.card))
+            .padding(AppSpacing.lg),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+    ) {
+        Text(
+            text = note.complexName,
+            style = AppTextStyles.monoCaption,
+            color = AppTheme.semanticColors.ink45,
+        )
+        Text(
+            text = note.memo,
+            style = MaterialTheme.typography.bodyMedium,
+            color = AppTheme.semanticColors.ink,
+        )
+    }
+}
+
 /** "누수·곰팡이"가 한 줄에 들어가는 폭. 더 좁히면 단어 중간에서 꺾인다. */
 private val LABEL_WIDTH = 88.dp
 private const val HIGHLIGHT_ALPHA = 0.08f
-private const val MEMO_MAX_LINES = 4
 
-@Preview(showBackground = true, heightDp = 1000)
+@Preview(showBackground = true, heightDp = 1100)
 @Composable
 private fun VisitCompareScreenPreview() {
     val notes = listOf(
         previewNote("A1", "관악푸르지오", light = 4, noise = 3, parking = 2, walk = 8, amount = 121_500),
-        previewNote("A2", "봉천두산", light = 3, noise = 4, parking = 4, walk = 12, amount = 98_000),
+        previewNote("A2", "부천중동 리첸시아", light = 3, noise = 2, parking = 5, walk = 5, amount = 71_000),
         previewNote("A3", "신림현대", light = 5, noise = 3, parking = null, walk = 5, amount = 87_000),
     )
     AppTheme {
@@ -445,7 +528,7 @@ private fun VisitCompareScreenPreview() {
             uiState = VisitCompareContract.State(
                 notes = notes,
                 isLoaded = true,
-                selectedCodes = notes.map { it.kaptCode },
+                selectedCodes = notes.take(2).map { it.kaptCode },
             ),
             onAction = {},
             onBackClick = {},

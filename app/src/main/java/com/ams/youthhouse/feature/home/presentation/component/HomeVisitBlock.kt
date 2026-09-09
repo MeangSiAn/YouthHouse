@@ -4,12 +4,15 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -20,10 +23,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.ams.youthhouse.R
+import com.ams.youthhouse.core.complex.domain.model.VisitCriterion
+import com.ams.youthhouse.core.complex.presentation.component.CriterionDots
+import com.ams.youthhouse.core.complex.presentation.component.shortLabelRes
 import com.ams.youthhouse.core.designsystem.component.EmptyContent
-import com.ams.youthhouse.core.designsystem.component.StatusLabel
-import com.ams.youthhouse.core.designsystem.component.StatusTone
 import com.ams.youthhouse.core.designsystem.theme.AppRadius
 import com.ams.youthhouse.core.designsystem.theme.AppSize
 import com.ams.youthhouse.core.designsystem.theme.AppSpacing
@@ -32,48 +37,45 @@ import com.ams.youthhouse.core.designsystem.theme.AppTheme
 import com.ams.youthhouse.feature.home.presentation.model.HomeVisitUiModel
 
 /**
- * 기획서 H-06 — 임장 예정은 카드로, 다녀온 곳은 행으로.
+ * 기획서 v6 홈 "최근 임장" — 가로 슬라이드 카드.
  *
- * 예정 카드는 코발트 테두리로 "아직 갈 곳"임을 알리고, 행의 별점은 시그널 색으로
- * 공고 카드의 상태 색과 구분한다. 홈에서만 쓰는 조합이라 designsystem으로 올리지 않는다.
+ * 목록 행이던 것을 카드로 바꿨다. 바로 아래 "알아두면 좋은 것"이 가로 슬라이드라
+ * 한 화면에 두 형식이 섞여 있었다. 카드에 메모는 넣지 않는다 — 홈은 떠올리는 자리고,
+ * 읽는 것은 매매 탭에서.
  */
 @Composable
-fun PlannedVisitCard(
-    visit: HomeVisitUiModel,
-    onClick: () -> Unit,
+fun VisitRail(
+    visits: List<HomeVisitUiModel>,
+    showMore: Boolean,
+    onVisitClick: (HomeVisitUiModel) -> Unit,
+    onMoreClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
+    ) {
+        items(visits, key = { it.kaptCode }) { visit ->
+            VisitMiniCard(visit = visit, onClick = { onVisitClick(visit) })
+        }
+        if (showMore) {
+            item { MoreMiniCard(onClick = onMoreClick) }
+        }
+    }
+}
+
+@Composable
+private fun VisitMiniCard(visit: HomeVisitUiModel, onClick: () -> Unit) {
     val shape = RoundedCornerShape(AppRadius.card)
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .border(BorderStroke(AppSize.borderStrong, MaterialTheme.colorScheme.primary), shape)
+        modifier = Modifier
+            .width(CARD_WIDTH)
+            .border(BorderStroke(AppSize.border, AppTheme.semanticColors.line), shape)
             .clip(shape)
             .clickable(onClick = onClick)
             .padding(AppSpacing.lg),
-        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = listOf(
-                    stringResource(R.string.home_visit_planned_date, visit.visitedOnLabel),
-                    visit.regionLabel,
-                ).filter { it.isNotBlank() }.joinToString(separator = " · "),
-                style = AppTextStyles.monoCaption,
-                color = AppTheme.semanticColors.ink45,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
-            )
-            StatusLabel(
-                text = stringResource(R.string.home_visit_planned),
-                tone = StatusTone.SOON,
-            )
-        }
         Text(
             text = visit.complexName,
             style = MaterialTheme.typography.titleSmall,
@@ -81,99 +83,80 @@ fun PlannedVisitCard(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        if (visit.viewedUnit.isNotBlank()) {
-            Text(
-                text = visit.viewedUnit,
-                style = MaterialTheme.typography.bodySmall,
-                color = AppTheme.semanticColors.ink70,
+        VisitWhenText(visit)
+        Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
+            CriterionDots(
+                label = stringResource(VisitCriterion.LIGHT.shortLabelRes()),
+                score = visit.lightScore,
+            )
+            CriterionDots(
+                label = stringResource(VisitCriterion.PARKING.shortLabelRes()),
+                score = visit.parkingScore,
             )
         }
     }
 }
 
-/** 다녀온 곳 목록. 기획서 `.rows` — 한 줄에 단지명·방문일·점검 진행, 오른쪽에 별점. */
+/**
+ * 날짜 자리 한 줄. 미완은 날짜 대신 강조색으로 재촉한다 — 임장은 바로 안 적으면
+ * 기억이 흐려진다(기획서 NOTE-03). 예정은 코발트로 "아직 갈 곳"임을 알린다.
+ */
 @Composable
-fun VisitRowGroup(
-    visits: List<HomeVisitUiModel>,
-    onVisitClick: (HomeVisitUiModel) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    if (visits.isEmpty()) return
+private fun VisitWhenText(visit: HomeVisitUiModel) {
+    val (text, color) = when {
+        visit.isPlanned ->
+            stringResource(R.string.home_visit_planned_date, visit.visitedOnLabel) to
+                MaterialTheme.colorScheme.primary
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                border = BorderStroke(AppSize.border, AppTheme.semanticColors.line),
-                shape = RoundedCornerShape(AppRadius.card),
-            ),
-    ) {
-        visits.forEachIndexed { index, visit ->
-            VisitRow(visit = visit, onClick = { onVisitClick(visit) })
-            if (index != visits.lastIndex) {
-                HorizontalDivider(
-                    thickness = AppSize.border,
-                    color = AppTheme.semanticColors.line2,
-                )
-            }
-        }
+        visit.isIncomplete ->
+            stringResource(R.string.home_visit_incomplete) to AppTheme.semanticColors.signalDeep
+
+        else ->
+            stringResource(
+                R.string.home_visit_done_summary,
+                visit.visitedOnLabel,
+                visit.ratedCount,
+                visit.totalCriteria,
+            ) to AppTheme.semanticColors.ink45
     }
+    Text(
+        text = text,
+        style = AppTextStyles.monoCaption,
+        color = color,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
 }
 
+/** 상한을 넘는 기록이 있을 때만 붙는 마지막 카드. 누르면 매매 탭. */
 @Composable
-private fun VisitRow(visit: HomeVisitUiModel, onClick: () -> Unit) {
-    Row(
+private fun MoreMiniCard(onClick: () -> Unit) {
+    val shape = RoundedCornerShape(AppRadius.card)
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = AppSpacing.lg, vertical = AppSpacing.md + AppSpacing.xs),
-        horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
-        verticalAlignment = Alignment.CenterVertically,
+            .width(MORE_WIDTH)
+            .height(CARD_MIN_HEIGHT)
+            .border(BorderStroke(AppSize.border, AppTheme.semanticColors.line), shape)
+            .clip(shape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(AppSpacing.xxs),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
         ) {
             Text(
-                text = visit.complexName,
-                style = MaterialTheme.typography.titleSmall,
-                color = AppTheme.semanticColors.ink,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                text = "›",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = if (visit.isIncomplete) {
-                    // 기획서 NOTE-03: 방문 후 며칠 지나면 기억이 흐려진다. 사과 대신 재촉한다.
-                    stringResource(R.string.home_visit_incomplete)
-                } else {
-                    stringResource(
-                        R.string.home_visit_done_summary,
-                        visit.visitedOnLabel,
-                        visit.ratedCount,
-                        visit.totalCriteria,
-                    )
-                },
+                text = stringResource(R.string.home_visit_more),
                 style = AppTextStyles.monoCaption,
-                color = if (visit.isIncomplete) {
-                    AppTheme.semanticColors.signalDeep
-                } else {
-                    AppTheme.semanticColors.ink45
-                },
+                color = AppTheme.semanticColors.ink45,
             )
         }
-        visit.stars?.let { stars -> StarText(stars = stars) }
     }
-}
-
-/** `★★★★☆` — 텍스트로 그린다. 홈에서 한 줄 요약으로 충분하고 아이콘 다섯 개보다 가볍다. */
-@Composable
-private fun StarText(stars: Int) {
-    val filled = stars.coerceIn(0, HomeVisitUiModel.MAX_STARS)
-    Text(
-        text = "★".repeat(filled) + "☆".repeat(HomeVisitUiModel.MAX_STARS - filled),
-        style = AppTextStyles.mono,
-        color = AppTheme.semanticColors.signal,
-    )
 }
 
 /** 기획서 SCREEN 02 임장기록 빈 상태. 노트는 단지 상세에서 쓰므로 매매 탭으로 보낸다. */
@@ -201,24 +184,27 @@ fun VisitEmptyBlock(
     }
 }
 
+private val CARD_WIDTH = 156.dp
+private val MORE_WIDTH = 88.dp
+private val CARD_MIN_HEIGHT = 108.dp
+
 @Preview(showBackground = true)
 @Composable
-private fun HomeVisitBlockPreview() {
+private fun VisitRailPreview() {
     AppTheme {
         Column(
             modifier = Modifier.padding(AppSpacing.xl),
             verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
         ) {
-            PlannedVisitCard(
-                visit = previewVisit("A1", "관악푸르지오아파트", planned = true, stars = null),
-                onClick = {},
-            )
-            VisitRowGroup(
+            VisitRail(
                 visits = listOf(
-                    previewVisit("A2", "봉천두산", stars = 4),
-                    previewVisit("A3", "신림현대", stars = 2, incomplete = true),
+                    previewVisit("A1", "관악우방", incomplete = true, light = 3, parking = 2),
+                    previewVisit("A2", "동탄금호어울림", light = 4, parking = 5),
+                    previewVisit("A3", "관악푸르지오아파트", planned = true, light = null, parking = null),
                 ),
+                showMore = true,
                 onVisitClick = {},
+                onMoreClick = {},
             )
             VisitEmptyBlock(onFindComplexClick = {})
         }
@@ -230,16 +216,18 @@ private fun previewVisit(
     name: String,
     planned: Boolean = false,
     incomplete: Boolean = false,
-    stars: Int?,
+    light: Int?,
+    parking: Int?,
 ) = HomeVisitUiModel(
     kaptCode = code,
     complexName = name,
     regionLabel = "서울특별시 관악구 봉천동",
-    visitedOnLabel = "07.27",
+    visitedOnLabel = "09.04",
     isPlanned = planned,
     isIncomplete = incomplete,
-    stars = stars,
-    ratedCount = if (incomplete) 1 else 4,
+    lightScore = light,
+    parkingScore = parking,
+    ratedCount = if (incomplete) 2 else 4,
     totalCriteria = 4,
-    viewedUnit = "84㎡ · 12층 · 남향",
+    viewedUnit = "84㎡ · 12층",
 )
