@@ -54,6 +54,7 @@ import com.ams.youthhouse.core.complex.domain.model.AreaTrend
 import com.ams.youthhouse.core.complex.domain.model.BuildingInfo
 import com.ams.youthhouse.core.complex.domain.model.ComplexDeal
 import com.ams.youthhouse.core.complex.domain.model.ComplexDetail
+import com.ams.youthhouse.core.complex.domain.model.FacilityGroup
 import com.ams.youthhouse.core.complex.domain.model.SiteVisitNote
 import com.ams.youthhouse.core.complex.domain.model.Surroundings
 import com.ams.youthhouse.core.complex.domain.model.TransitInfo
@@ -519,14 +520,35 @@ private fun TransitSection(transit: TransitInfo) {
 private fun SurroundingSection(surroundings: Surroundings) {
     Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.lg)) {
         SectionHeader(title = stringResource(R.string.complex_section_surroundings))
-        FacilityGroup(stringResource(R.string.complex_facility_education), surroundings.education)
-        FacilityGroup(stringResource(R.string.complex_facility_convenient), surroundings.convenient)
-        FacilityGroup(stringResource(R.string.complex_facility_welfare), surroundings.welfare)
+        FacilityRows(stringResource(R.string.complex_facility_education), surroundings.education)
+        FacilityRows(stringResource(R.string.complex_facility_convenient), surroundings.convenient)
+        FacilityChips(stringResource(R.string.complex_facility_welfare), surroundings.welfare)
     }
 }
 
+/**
+ * 분류가 있는 시설은 "초등학교 | 구암, 신봉, 은천초등학교"처럼 행으로.
+ * 칩으로 늘어놓으면 분류와 이름이 섞여 무엇이 무엇인지 읽히지 않는다.
+ */
 @Composable
-private fun FacilityGroup(label: String, items: List<String>) {
+private fun FacilityRows(label: String, groups: List<FacilityGroup>) {
+    if (groups.isEmpty()) return
+
+    Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
+        Text(
+            text = label,
+            style = AppTextStyles.monoCaption,
+            color = AppTheme.semanticColors.ink45,
+        )
+        groups.forEach { group ->
+            InfoRow(label = group.category, value = group.names.joinToString(separator = ", "))
+        }
+    }
+}
+
+/** 단지 내 시설은 분류 없는 짧은 이름들이라 칩이 맞다. */
+@Composable
+private fun FacilityChips(label: String, items: List<String>) {
     if (items.isEmpty()) return
 
     Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
@@ -636,8 +658,16 @@ private fun previewDetail() = ComplexDetail(
         busWalkTime = "10~15분이내",
     ),
     surroundings = Surroundings(
-        convenient = listOf("관공서(청림동)", "병원(고려병원)", "대형상가(관악프라자)"),
-        education = listOf("초등학교(봉천초등학교)", "중학교(상도중학교)", "고등학교(동작고교)"),
+        convenient = listOf(
+            FacilityGroup("관공서", listOf("청림동")),
+            FacilityGroup("병원", listOf("고려병원")),
+            FacilityGroup("대형상가", listOf("관악프라자")),
+        ),
+        education = listOf(
+            FacilityGroup("초등학교", listOf("봉천초등학교")),
+            FacilityGroup("중학교", listOf("상도중학교")),
+            FacilityGroup("대학교", listOf("서울대학교", "숭실대학교")),
+        ),
         welfare = listOf("관리사무소", "노인정", "보육시설", "어린이놀이터"),
     ),
     areas = listOf(84.9, 59.58),

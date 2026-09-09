@@ -94,10 +94,20 @@ data class TransitInfo(
             .any { !it.isNullOrBlank() }
 }
 
-/** 주변·단지 내 시설. 원문이 한 줄 문자열이라 매퍼가 항목으로 쪼개 둔다. */
+/**
+ * 주변 시설 한 분류와 그 이름들. `초등학교 → [치동초교]`, `대형상가 → [LG하이프라자, 하이마트]`.
+ * 이름이 하나도 없는 분류는 만들지 않는다.
+ */
+data class FacilityGroup(
+    val category: String,
+    val names: List<String>,
+)
+
+/** 주변·단지 내 시설. 원문이 한 줄 문자열이라 매퍼가 분류·항목으로 쪼개 둔다. */
 data class Surroundings(
-    val convenient: List<String>,
-    val education: List<String>,
+    val convenient: List<FacilityGroup>,
+    val education: List<FacilityGroup>,
+    /** 단지 내 시설은 분류 없이 이름만 온다. */
     val welfare: List<String>,
 ) {
     val hasAny: Boolean

@@ -86,19 +86,10 @@ private fun ComplexInfoDto?.toTransitInfo(): TransitInfo = TransitInfo(
 )
 
 private fun ComplexInfoDto?.toSurroundings(): Surroundings = Surroundings(
-    // 편의·교육은 "관공서(청림동) 병원(고려병원)"처럼 공백으로 이어 붙어 온다.
-    // 괄호 안에는 공백이 없어 공백 분리가 안전하다.
-    convenient = this?.convenientFacility.splitFacilities(" "),
-    education = this?.educationFacility.splitFacilities(" "),
-    // 단지 내 시설만 쉼표로 온다.
-    welfare = this?.welfareFacility.splitFacilities(","),
+    convenient = parseFacilityGroups(this?.convenientFacility),
+    education = parseFacilityGroups(this?.educationFacility),
+    welfare = parseWelfareFacilities(this?.welfareFacility),
 )
-
-private fun String?.splitFacilities(separator: String): List<String> =
-    this?.split(separator)
-        ?.map(String::trim)
-        ?.filter { it.isNotEmpty() }
-        .orEmpty()
 
 private fun String.trimOrNull(): String? = trim().takeIf { it.isNotEmpty() }
 
