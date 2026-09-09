@@ -37,9 +37,10 @@ iOS 영향 없음 (Android Studio 설정 파일 무시).
 
 ---
 
-## 기준선 · `e66e26f` · 2026-09-06
+## 기준선 · `08ed23e` · 2026-09-06
 
-**커밋 `e66e26f`(feature: fetch notices from our backend instead of data.go.kr)까지는 iOS에 이미 반영됐다.**
+**커밋 `08ed23e`(feature: fetch notices from our backend instead of data.go.kr)까지는 iOS에 이미 반영됐다.**
+(2026-09-09 작성자 정보 정리로 이력을 다시 써서 해시가 바뀌었다. 구 해시 `e66e26f` = 현 `08ed23e`, 내용은 같다.)
 이 항목 아래에는 기록이 없다. iOS는 여기서부터 위로 읽는다.
 
 기준선 시점의 Android 구성 요약 (참고용):
