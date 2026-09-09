@@ -158,6 +158,18 @@
     <string name="settings_region_description">홈과 공고 목록에 함께 적용됩니다</string>
     <string name="settings_category">공고 분야</string>
     <string name="settings_category_description">공고 목록에서 먼저 보여줄 분야</string>
+    <string name="settings_section_data">데이터</string>
+    <string name="settings_section_data_scope">기기 저장</string>
+    <string name="settings_backup_export">백업 파일 만들기</string>
+    <string name="settings_backup_export_description">찜·관심 단지·임장노트를 파일로 내보냅니다</string>
+    <string name="settings_backup_import">백업 파일 불러오기</string>
+    <string name="settings_backup_import_description">기기를 바꿀 때 사용합니다. 기존 기록은 지우지 않습니다</string>
+    <string name="settings_backup_busy">처리 중</string>
+    <string name="backup_summary">임장노트 %1$d건 · 찜 %2$d건 · 관심 단지 %3$d곳</string>
+    <string name="backup_exported">백업 파일을 만들었습니다 — %1$s</string>
+    <string name="backup_imported">불러왔습니다 — %1$s</string>
+    <string name="backup_invalid_file">청년의집 백업 파일이 아닙니다</string>
+    <string name="backup_failed">백업 파일을 처리하지 못했습니다</string>
     <string name="settings_section_info">정보</string>
     <string name="settings_privacy_policy">개인정보처리방침</string>
     <string name="settings_privacy_policy_value">보기</string>
@@ -165,7 +177,7 @@
     <string name="settings_data_source_value">공공데이터포털</string>
     <string name="settings_version">앱 버전</string>
     <string name="settings_dialog_close">닫기</string>
-    <string name="settings_footnote">설정은 이 기기에만 저장되며 서버로 전송되지 않습니다. 공고 정보는 국토교통부 마이홈포털이 공공데이터포털을 통해 제공합니다.</string>
+    <string name="settings_footnote">설정은 이 기기에만 저장되며 서버로 전송되지 않습니다. 앱을 지우면 저장된 내용도 함께 사라집니다 — 임장노트가 쌓였다면 백업 파일을 만들어 두세요. 공고 정보는 국토교통부 마이홈포털이 공공데이터포털을 통해 제공합니다.</string>
 
     <!-- 공통 -->
     <string name="retry">다시 시도</string>

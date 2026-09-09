@@ -4,6 +4,25 @@
 
 <!-- 새 항목은 이 줄 바로 아래에 추가한다. -->
 
+## 2026-09-09 · (해시 미정) · feature: backup export and import as a JSON file
+
+**영역**: 마이 탭 › 데이터
+**사용자 관점 변경**: “백업 파일 만들기” → 시스템 저장 대화상자에서 위치를 고르면 `youthhouse-backup-YYYYMMDD.json`을 쓴다. “백업 파일 불러오기” → 파일을 고르면 기기에 **합친다**(같은 단지 노트는 덮어쓰고, 찜·관심 단지는 없는 것만 추가, 설정은 파일 값으로). 결과는 스낵바 한 줄: `불러왔습니다 — 임장노트 4건 · 찜 3건 · 관심 단지 2곳`. 처리 중에는 행이 “처리 중”.
+**데이터·API**: 서버 없음. **파일 형식은 iOS와 공유하는 계약** — `core/backup/data/dto/BackupFileDto.kt`. 최상위 키:
+- `app`: `"youthhouse"` (아니면 거부), `format_version`: `1` (더 크면 거부), `exported_at`: epoch millis, `author_token`: 기기당 무작위 UUID(공개 노트 전환용 예비, 개인 식별 아님)
+- `settings`: `{ region_code: "11"|null, category: "RENTAL"|"SALE", status_filter: "OPEN"|"UPCOMING"|"ALL" }`
+- `favorite_notices`: 공고 도메인 모델 `Notice`의 JSON 그대로 (찜 DB 스냅숏과 동일; `noticeId` 없으면 무시)
+- `favorite_complexes`: `[{ kapt_code, name, region_label }]`
+- `site_visit_notes`: `[{ kapt_code, complex_name, region_label, visited_on:"YYYYMMDD", viewed_unit, scores:{LIGHT|NOISE|PARKING|MANAGEMENT: 1..5}, walk_to_station_minutes, elevator: UNCHECKED|COMFORTABLE|CROWDED|NONE, defect: UNCHECKED|NONE|FOUND, memo, snapshot:{ built_year, household_count, subway_label, reference_area, reference_amount }, updated_at }]`
+- 읽을 때 규칙: 모르는 키 무시, 모르는 enum 이름은 `UNCHECKED`, 점수는 1~5로 접음, `snapshot` 없으면 빈 값. 케이스는 `BackupCodecTest` 7개.
+**네비게이션**: 없음(마이 탭 안)
+**문구**: `settings_section_data` 데이터 · `settings_section_data_scope` 기기 저장 · `settings_backup_export` 백업 파일 만들기 · `settings_backup_export_description` 찜·관심 단지·임장노트를 파일로 내보냅니다 · `settings_backup_import` 백업 파일 불러오기 · `settings_backup_import_description` 기기를 바꿀 때 사용합니다. 기존 기록은 지우지 않습니다 · `settings_backup_busy` 처리 중 · `backup_summary` 임장노트 %1$d건 · 찜 %2$d건 · 관심 단지 %3$d곳 · `backup_exported` 백업 파일을 만들었습니다 — %1$s · `backup_imported` 불러왔습니다 — %1$s · `backup_invalid_file` 청년의집 백업 파일이 아닙니다 · `backup_failed` 백업 파일을 처리하지 못했습니다 · `settings_footnote`에 “앱을 지우면 저장된 내용도 함께 사라집니다 — 임장노트가 쌓였다면 백업 파일을 만들어 두세요.” 추가
+**규칙·엣지케이스**: 불러오기는 삭제하지 않는다. 파일이 8MB를 넘으면 거부. 저장소 권한 없이 시스템 파일 선택기만 쓴다.
+**iOS 체크리스트**:
+- [ ] 같은 JSON 형식으로 내보내기/불러오기 (UIDocumentPicker). Android 파일을 iOS에서, iOS 파일을 Android에서 읽을 수 있어야 함
+- [ ] 마이 탭 “데이터” 섹션 두 행 + 결과 토스트/스낵바
+- [ ] `author_token`을 기기당 1회 생성해 저장, 불러올 때 없으면 파일 값 채택
+
 ## 2026-09-09 · (해시 미정) · feature: visit note cards with rating dots, compare picker and sticky header
 
 **영역**: 홈 임장기록 · 매매 탭 노트 카드 · 단지 상세 노트 카드 · 임장노트 편집 · 임장 단지 비교 (기획서 v6 반영)

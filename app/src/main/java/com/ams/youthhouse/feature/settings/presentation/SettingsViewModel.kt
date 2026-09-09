@@ -1,10 +1,15 @@
 package com.ams.youthhouse.feature.settings.presentation
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.ams.youthhouse.core.backup.domain.repository.BackupFormatException
+import com.ams.youthhouse.core.backup.domain.repository.BackupRepository
 import com.ams.youthhouse.core.common.AppInfo
+import com.ams.youthhouse.core.common.time.TodayProvider
 import com.ams.youthhouse.core.notice.domain.repository.NoticeFilterRepository
 import com.ams.youthhouse.core.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -15,6 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val noticeFilterRepository: NoticeFilterRepository,
+    private val backupRepository: BackupRepository,
+    private val todayProvider: TodayProvider,
     appInfo: AppInfo,
 ) : BaseViewModel<
     SettingsContract.State,
@@ -73,10 +80,59 @@ class SettingsViewModel @Inject constructor(
             SettingsContract.Action.PrivacyPolicyRowClicked -> {
                 sendEffect(SettingsContract.Effect.OpenUrl(PRIVACY_POLICY_URL))
             }
+
+            SettingsContract.Action.ExportBackupClicked -> {
+                if (currentState.isBackupBusy) return
+                sendEffect(
+                    SettingsContract.Effect.PickBackupTarget(
+                        suggestedFileName = "$BACKUP_FILE_PREFIX${todayProvider.today()}.json",
+                    ),
+                )
+            }
+
+            SettingsContract.Action.ImportBackupClicked -> {
+                if (currentState.isBackupBusy) return
+                sendEffect(SettingsContract.Effect.PickBackupSource)
+            }
+
+            is SettingsContract.Action.BackupTargetPicked -> {
+                val uri = action.uri ?: return
+                runBackup { BackupMessage.Exported(backupRepository.export(uri)) }
+            }
+
+            is SettingsContract.Action.BackupSourcePicked -> {
+                val uri = action.uri ?: return
+                runBackup { BackupMessage.Imported(backupRepository.import(uri)) }
+            }
+
+            SettingsContract.Action.BackupMessageShown -> {
+                updateState { copy(backupMessage = null) }
+            }
+        }
+    }
+
+    private fun runBackup(block: suspend () -> BackupMessage) {
+        updateState { copy(isBackupBusy = true) }
+        viewModelScope.launch {
+            val message = try {
+                block()
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: BackupFormatException) {
+                Log.w(TAG, "백업 파일 형식이 맞지 않습니다", exception)
+                BackupMessage.InvalidFile
+            } catch (throwable: Throwable) {
+                Log.w(TAG, "백업 처리에 실패했습니다", throwable)
+                BackupMessage.Failed
+            }
+            updateState { copy(isBackupBusy = false, backupMessage = message) }
         }
     }
 
     private companion object {
+        const val TAG = "SettingsViewModel"
+        const val BACKUP_FILE_PREFIX = "youthhouse-backup-"
+
         /**
          * 개인정보처리방침 랜딩. Play Console 앱 콘텐츠에 등록하는 주소와 **같은 값이어야 한다.**
          * 둘이 어긋나면 심사에서 앱 안의 링크와 스토어 표기가 다르다고 잡힌다.
