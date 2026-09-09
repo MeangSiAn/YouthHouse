@@ -4,6 +4,10 @@
 
 <!-- 새 항목은 이 줄 바로 아래에 추가한다. -->
 
+## 2026-09-06 · (해시 미정) · chore: ignore the whole .idea directory
+
+iOS 영향 없음 (Android Studio 설정 파일 무시).
+
 ---
 
 ## 기준선 · `e66e26f` · 2026-09-06

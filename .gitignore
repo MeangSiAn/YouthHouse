@@ -17,18 +17,10 @@ google-services.json
 
 # --- IDE / 에디터 ---
 *.iml
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-# 아래는 Android Studio가 실행·배포할 때 만드는 기기/세션 기록이라 사람마다 다르다.
-/.idea/deploymentTargetSelector.xml
-/.idea/deploymentTargetDropDown.xml
-/.idea/androidTestResultsUserPreferences.xml
-/.idea/appInsightsSettings.xml
-/.idea/migrations.xml
+# .idea는 통째로 무시한다. 파일 단위로 골라 추적하면 Android Studio가 버전마다 새 파일을
+# 만들 때마다 미추적 파일이 늘어나고, 1인 개발이라 공유할 IDE 설정도 없다.
+# 빌드에 필요한 것은 전부 Gradle 파일에 있다.
+/.idea/
 
 # Claude Code의 개인 설정(권한 허용 목록 등). 공유용은 .claude/settings.json 쪽이다.
 .claude/settings.local.json
