@@ -30,12 +30,14 @@ class ScheduleViewModel @Inject constructor(
                 // 화면이 밤을 넘겨 떠 있는 경우보다 찜 변경이 훨씬 잦으므로
                 // "지금"은 emit마다 다시 읽는다. 자정이 지나면 다음 변경 때 따라온다.
                 val today = todayProvider.today()
+                val upcoming = favorites.filterUpcomingDeadlines(today)
                 updateState {
                     copy(
                         isLoading = false,
-                        upcoming = favorites.filterUpcomingDeadlines(today)
-                            .map { it.toUiModel(today) },
-                        favorites = favorites.map { it.toUiModel(today) },
+                        upcoming = upcoming.map { it.toUiModel(today) },
+                        // 마감 임박에 오른 공고는 아래 목록에서 뺀다. 같은 카드가 두 번 보이면
+                        // 찜이 두 건인지 헷갈리고, 급한 것이 급해 보이지도 않는다.
+                        favorites = (favorites - upcoming.toSet()).map { it.toUiModel(today) },
                     )
                 }
             }

@@ -8,17 +8,17 @@ import com.ams.youthhouse.core.presentation.contract.UiState
 object ScheduleContract {
 
     /**
-     * 두 구간 모두 찜에서 파생된다 — [upcoming]은 접수중이면서 마감이 임박한 것만 추린 것.
-     * 별도 저장소가 아니라 같은 데이터의 다른 조명이므로, 항목이 양쪽에 함께 보일 수 있다.
+     * 두 구간 모두 찜에서 파생된다 — [upcoming]은 접수중이면서 마감이 임박한 것만 추린 것이고,
+     * [favorites]는 그것을 뺀 나머지다. 한 공고는 한 구간에만 보인다.
      */
     data class State(
         val isLoading: Boolean = true,
         /** 접수중 + 마감 D-7 이내. 마감이 가까운 순. */
         val upcoming: List<NoticeUiModel> = emptyList(),
-        /** 찜 전체. 최근에 찜한 순. */
+        /** [upcoming]에 오르지 않은 찜. 최근에 찜한 순. */
         val favorites: List<NoticeUiModel> = emptyList(),
     ) : UiState {
-        val isEmpty: Boolean get() = !isLoading && favorites.isEmpty()
+        val isEmpty: Boolean get() = !isLoading && upcoming.isEmpty() && favorites.isEmpty()
     }
 
     sealed interface Action : UiAction {

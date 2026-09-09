@@ -93,21 +93,24 @@ private fun ScheduleContent(
             )
         }
 
-        item {
-            SectionHeader(
-                title = stringResource(R.string.schedule_section_favorites),
-                trailingText = pluralStringResource(
-                    R.plurals.schedule_favorite_count,
-                    uiState.favorites.size,
-                    uiState.favorites.size,
-                ),
+        // 찜이 전부 마감 임박이면 이 구간은 비어 있다. 빈 제목을 남기지 않는다.
+        if (uiState.favorites.isNotEmpty()) {
+            item {
+                SectionHeader(
+                    title = stringResource(R.string.schedule_section_favorites),
+                    trailingText = pluralStringResource(
+                        R.plurals.schedule_favorite_count,
+                        uiState.favorites.size,
+                        uiState.favorites.size,
+                    ),
+                )
+            }
+            noticeCards(
+                notices = uiState.favorites,
+                keyPrefix = "favorite",
+                onAction = onAction,
             )
         }
-        noticeCards(
-            notices = uiState.favorites,
-            keyPrefix = "favorite",
-            onAction = onAction,
-        )
 
         item { FootnoteText(text = stringResource(R.string.schedule_footnote)) }
     }
